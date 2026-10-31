@@ -31,7 +31,7 @@ Everything else was written again.
 
 ## Tested here
 
-- `control/`: 99 tests (config checks, MAX31855 decoding, relay
+- `control/`: 102 tests (config checks, MAX31855 decoding, relay
   time-proportioning and failsafe, PID, safety latches, power cap, Chef iQ
   decoding with real captures, cook lifecycle, live WebSocket server with
   history, resume and command tokens, preflight, ssr_test).

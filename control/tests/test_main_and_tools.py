@@ -13,7 +13,8 @@ import ssr_test
 from cook import COOKING
 from grill_probe import encode_max31855
 from helpers import FakeGPIO, FakeSpiDev, ManualClock, config, write_config
-from live_server import LiveServer, wait_listening
+import live_server
+from live_server import LiveServer, load_connect, wait_listening
 
 
 # ------------------------------------------------------------ Controller
@@ -129,7 +130,7 @@ def test_main_bad_config(tmp_path, capsys):
 # ------------------------------------------------------------ live server
 def ws_session(port, messages, expect):
     """Connect, send messages, collect `expect` replies."""
-    from websockets.asyncio.client import connect
+    connect = load_connect()
 
     async def go():
         got = []
@@ -154,7 +155,7 @@ def free_port():
 def test_live_history_resume_and_commands(tmp_path):
     port = free_port()
     live = LiveServer("127.0.0.1", port, 3, 5, token="secret").start()
-    assert wait_listening(live)
+    assert wait_listening(live), live.error
     try:
         for i in range(5):
             live.publish({"i": i}, {"state": "idle"})
@@ -176,10 +177,10 @@ def test_live_history_resume_and_commands(tmp_path):
 def test_live_commands_reach_the_controller(tmp_path):
     port = free_port()
     live = LiveServer("127.0.0.1", port, 50, 5, token="secret").start()
-    assert wait_listening(live)
+    assert wait_listening(live), live.error
     ctl, clk = sim_controller(tmp_path, live=live)
     try:
-        from websockets.asyncio.client import connect
+        connect = load_connect()
 
         async def go():
             async with connect(f"ws://127.0.0.1:{port}") as ws:
@@ -208,7 +209,7 @@ def test_live_commands_reach_the_controller(tmp_path):
 def test_live_without_token_refuses_everything():
     port = free_port()
     live = LiveServer("127.0.0.1", port, 5, 5, token=None).start()
-    assert wait_listening(live)
+    assert wait_listening(live), live.error
     try:
         got = ws_session(port, [{"type": "hello"}, {"type": "command", "id": 1,
                                                     "token": "", "command": "stop"}], 1)
@@ -349,3 +350,38 @@ def test_relays_off_drives_both_relay_pins_low(tmp_path):
 def test_relays_off_without_config_uses_wired_pins(tmp_path):
     import relays_off
     assert relays_off.relay_pins(str(tmp_path / "missing.yaml")) == [17, 27]
+
+
+def test_live_server_says_why_when_websockets_is_missing(monkeypatch):
+    def broken():
+        raise ImportError("the websockets package isn't installed in this Python")
+    monkeypatch.setattr(live_server, "load_serve", broken)
+    live = LiveServer("127.0.0.1", free_port(), 5, 5).start()
+    assert not wait_listening(live, timeout=3)
+    assert "isn't installed" in live.error
+    live.stop()
+
+
+def test_live_server_on_the_legacy_api(monkeypatch):
+    legacy = pytest.importorskip("websockets.legacy.server")
+    monkeypatch.setattr(live_server, "load_serve", lambda: (legacy.serve, True))
+    port = free_port()
+    live = LiveServer("127.0.0.1", port, 5, 5, token="t").start()
+    try:
+        assert wait_listening(live), live.error
+        live.publish({"i": 1}, {})
+        import time
+        time.sleep(0.2)
+        got = ws_session(port, [{"type": "hello"}], 1)
+        assert got[0]["seq"] == 1
+    finally:
+        live.stop()
+
+
+def test_preflight_live_stream_check(tmp_path, monkeypatch):
+    c = preflight.check_websockets(config(tmp_path))
+    assert c.ok and "websockets" in c.detail
+    monkeypatch.setattr(live_server, "load_serve",
+                        lambda: (_ for _ in ()).throw(ImportError("too old")))
+    c = preflight.check_websockets(config(tmp_path))
+    assert not c.ok and c.warn_only and "too old" in c.detail

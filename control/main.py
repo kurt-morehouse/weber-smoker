@@ -32,7 +32,7 @@ from chefiq_ble import BleScanner, FakeProbes, ProbeTracker
 from cook import COOKING, ZONES, CookManager
 from gpio_lock import GpioLock, LockHeld
 from grill_probe import ThermocoupleFault, ThermocoupleReader
-from live_server import LiveServer, read_token
+from live_server import LiveServer, read_token, wait_listening
 from pid_controller import PID
 from relay_driver import SSRDriver
 from safety import SafetyMonitor, cap_combined_duty
@@ -253,6 +253,10 @@ def main(argv=None):
                   f"streaming only, every command will be refused", flush=True)
         live = LiveServer(ws["host"], ws["port"], ws["history_rows"],
                           ws["max_pending_commands"], token, ws["retry_seconds"]).start()
+        if not wait_listening(live, timeout=5.0):
+            # Keep controlling the grill (the relays don't depend on the stream),
+            # but say loudly why the dashboard will see nothing.
+            print(f"WARNING: {live.error}", flush=True)
 
     ctl = None
     scanner = None
@@ -268,7 +272,9 @@ def main(argv=None):
         if cfg["chefiq"]["enabled"] and not args.simulate:
             scanner = BleScanner(ctl.tracker).start()
         interval = cfg["loop"]["interval_seconds"]
-        print(f"running: IDLE, relays off; live stream on port {ws['port']}", flush=True)
+        stream = (f"live stream on port {ws['port']}" if live and live.listening.is_set()
+                  else "NO live stream" if ws["enabled"] else "live stream disabled")
+        print(f"running: IDLE, relays off; {stream}", flush=True)
         next_t = time.monotonic()
         last_print = 0.0
         while not stop["flag"]:

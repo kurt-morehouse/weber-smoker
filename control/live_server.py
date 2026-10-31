@@ -31,6 +31,54 @@ import threading
 import time
 import uuid
 
+MIN_WEBSOCKETS = (10, 1)       # 13+ preferred; 10.1-12.x run on the legacy API
+
+
+def websockets_version():
+    """websockets' version as a tuple, or None if it isn't installed."""
+    try:
+        import websockets
+    except ImportError:
+        return None
+    parts = []
+    for p in str(getattr(websockets, "__version__", "0")).split(".")[:2]:
+        digits = "".join(ch for ch in p if ch.isdigit())
+        parts.append(int(digits or 0))
+    return tuple(parts)
+
+
+def load_serve():
+    """websockets' serve(), new API if it has one, else the legacy one.
+
+    Raises ImportError with a clear message if websockets is missing or too old.
+    Debian Bookworm's apt python3-websockets is 10.4 (legacy API only), and a
+    venv made with --system-site-packages can pick that up.
+    """
+    try:
+        from websockets.asyncio.server import serve       # websockets >= 13
+        return serve, False
+    except ImportError:
+        pass
+    ver = websockets_version()
+    if ver is None:
+        raise ImportError("the websockets package isn't installed in this Python "
+                          "(run: cd ~/smoker/control && ~/.local/bin/uv sync)")
+    if ver < MIN_WEBSOCKETS:
+        raise ImportError(f"websockets {ver[0]}.{ver[1]} is too old (need 13+, or at least 10.1); "
+                          f"run: cd ~/smoker/control && ~/.local/bin/uv sync")
+    from websockets.legacy.server import serve                # 10.1 - 12.x
+    return serve, True
+
+
+def load_connect():
+    """websockets' client connect(), new API if available (used by tests)."""
+    try:
+        from websockets.asyncio.client import connect
+        return connect
+    except ImportError:
+        from websockets.legacy.client import connect
+        return connect
+
 
 class LiveServer:
     def __init__(self, host, port, history_rows, max_pending, token=None, retry_seconds=5.0):
@@ -44,6 +92,7 @@ class LiveServer:
         self.clients = set()
         self.error = None
         self.listening = threading.Event()
+        self.failed = threading.Event()        # set if the server thread gave up
         self._loop = None
         self._stop = None
         self._thread = None
@@ -149,7 +198,13 @@ class LiveServer:
         await ws.send(json.dumps({"type": "command_result", "id": cmd_id, "ok": ok, "message": why}))
 
     def _run(self):
-        from websockets.asyncio.server import serve
+        try:
+            serve, legacy = load_serve()
+        except ImportError as e:
+            self.error = f"live stream off: {e}"
+            self.failed.set()
+            return
+        handler = (lambda ws, *path: self._handler(ws)) if legacy else self._handler
         self._loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._loop)
         self._stop = asyncio.Event()
@@ -157,7 +212,7 @@ class LiveServer:
         async def main():
             while not self._stop.is_set():
                 try:
-                    async with serve(self._handler, self.host, self.port, ping_interval=20):
+                    async with serve(handler, self.host, self.port, ping_interval=20):
                         self.error = None
                         self.listening.set()
                         await self._stop.wait()
@@ -171,6 +226,10 @@ class LiveServer:
 
         try:
             self._loop.run_until_complete(main())
+        except Exception as e:                  # never die without saying why
+            self.error = f"live stream stopped: {type(e).__name__}: {e}"
+            self.listening.clear()
+            self.failed.set()
         finally:
             self._loop.close()
 
@@ -183,10 +242,16 @@ def read_token(path):
     return t or None
 
 
-def wait_listening(server, timeout=5.0):
+def wait_listening(server, timeout=10.0):
+    """True once the server listens; False if it failed or timed out
+    (server.error then says why, if it knows)."""
     end = time.monotonic() + timeout
     while time.monotonic() < end:
         if server.listening.is_set():
             return True
+        if server.failed.is_set():
+            return False
         time.sleep(0.02)
+    if server.error is None:
+        server.error = f"not listening on {server.host}:{server.port} after {timeout:g} s"
     return False

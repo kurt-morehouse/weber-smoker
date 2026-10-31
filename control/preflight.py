@@ -10,6 +10,7 @@ the service doesn't start on broken hardware (systemd retries every 15 s).
     GPIO library   RPi.GPIO loads in this Python (and from where)
     GPIO           both relay pins can be set up as outputs
     Relays off     both relay pins read low
+    Live stream    websockets loads, for the dashboard (WARN only)
     Bluetooth      Chef iQ probes heard (WARN only: probes never control)
 
     cd ~/smoker/control && .venv/bin/python preflight.py
@@ -143,6 +144,20 @@ def check_gpio(cfg, simulate, gpio=None):
     return out
 
 
+def check_websockets(cfg):
+    """The live stream's library. WARN only: the grill runs without the stream."""
+    if not cfg["websocket"]["enabled"]:
+        return Check("Live stream", True, "disabled in config")
+    import live_server
+    try:
+        _, legacy = live_server.load_serve()
+    except ImportError as e:
+        return Check("Live stream", False, str(e), warn_only=True)
+    v = live_server.websockets_version()
+    note = " (legacy API; uv sync to update)" if legacy else ""
+    return Check("Live stream", True, f"websockets {v[0]}.{v[1]}{note} in {sys.executable}")
+
+
 def check_bluetooth(cfg, simulate, seconds=8.0):
     if not cfg["chefiq"]["enabled"]:
         return Check("Bluetooth", True, "Chef iQ disabled in config")
@@ -174,6 +189,7 @@ def run(cfg, simulate, dev_dir="/dev", boot_configs=BOOT_CONFIGS, gpio=None, blu
     for z in ZONES:
         checks.append(check_thermocouple(cfg, z, simulate))
     checks.extend(check_gpio(cfg, simulate, gpio))
+    checks.append(check_websockets(cfg))
     if bluetooth:
         checks.append(check_bluetooth(cfg, simulate))
     return checks
