@@ -44,10 +44,15 @@ def decode_max31855(raw):
     Bits 15..4:  cold junction (the board), 12-bit signed, 0.0625 C per count
     Bits 2..0:   SCV (short to VCC), SCG (short to GND), OC (open circuit)
     """
-    if raw in (0x00000000, 0xFFFFFFFF):
-        # A board that is unpowered, unplugged or on the wrong bus reads as
-        # all zeros or all ones: no real reading looks like that.
-        raise ThermocoupleFault("no response from MAX31855 (check wiring / SPI)", "spi_error")
+    if raw == 0x00000000:
+        # No real reading looks like this: DO is stuck low (board unpowered,
+        # or DO shorted to ground).
+        raise ThermocoupleFault("no response from MAX31855: read 0x00000000, all zeros "
+                                "(board unpowered? check Vin/GND, then DO)", "spi_error")
+    if raw == 0xFFFFFFFF:
+        # DO floating high: the Pi isn't hearing the board at all.
+        raise ThermocoupleFault("no response from MAX31855: read 0xFFFFFFFF, all ones "
+                                "(DO not connected? check DO, CLK and CS)", "spi_error")
     if raw & 0x00010000:
         if raw & 0x1:
             raise ThermocoupleFault("thermocouple open circuit (unplugged?)", "open")

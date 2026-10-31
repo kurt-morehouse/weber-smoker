@@ -40,10 +40,14 @@ def test_faults(bits, kind):
     assert e.value.kind == kind
 
 
-@pytest.mark.parametrize("raw", [0x00000000, 0xFFFFFFFF])
-def test_no_response(raw):
-    with pytest.raises(ThermocoupleFault, match="no response"):
+@pytest.mark.parametrize("raw,hint", [(0x00000000, "all zeros.*Vin/GND"),
+                                      (0xFFFFFFFF, "all ones.*DO not connected")])
+def test_no_response_says_which(raw, hint):
+    with pytest.raises(ThermocoupleFault, match="no response") as e:
         decode_max31855(raw)
+    assert e.value.kind == "spi_error"
+    import re
+    assert re.search(hint, str(e.value))
 
 
 def test_reader_opens_its_own_bus(monkeypatch):
