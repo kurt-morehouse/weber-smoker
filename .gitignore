@@ -1,0 +1,22 @@
+# secrets
+control/command_token
+*.pem
+id_*
+ssh-copy-id*
+
+# environments and caches
+.venv/
+__pycache__/
+.pytest_cache/
+.DS_Store
+.idea/
+
+# cook data stays out of git (back it up separately)
+data/*.csv
+data/*_meta.json
+data/*.txt
+data/*.log
+data/*.json
+data/raw/
+data/journal/
+!data/.gitkeep

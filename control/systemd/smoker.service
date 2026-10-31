@@ -1,0 +1,22 @@
+[Unit]
+Description=Weber smoker controller (preflight, then main.py)
+After=network-online.target bluetooth.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/smoker/control
+ExecStartPre=/home/pi/smoker/control/.venv/bin/python preflight.py
+ExecStart=/home/pi/smoker/control/.venv/bin/python main.py
+# main.py turns both relays off on SIGTERM before it exits. If it was killed
+# outright, ExecStopPost still forces both relay pins low.
+ExecStopPost=/home/pi/smoker/control/.venv/bin/python tools/relays_off.py
+KillSignal=SIGTERM
+TimeoutStopSec=15
+Restart=always
+RestartSec=15
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,137 @@
+# ---------------------------------------------------------------------------
+# Central configuration for the dual-zone smoker controller. Every tunable
+# lives here.
+#
+# settings.py checks this file at startup and refuses to run if a value is
+# missing, misspelled or out of range (the systemd service keeps retrying
+# until it is fixed). Run `python settings.py` to check it by hand.
+#
+# Temperatures are in Fahrenheit throughout, matching the CSV columns.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Zones
+# ---------------------------------------------------------------------------
+# Each zone's MAX31855 has its own SPI bus, so no header pins are shared.
+# The board reads /dev/spidev<spi_bus>.<spi_chip_select>.
+#   SPI0 needs dtparam=spi=on; SPI1 needs dtoverlay=spi1-1cs in
+#   /boot/firmware/config.txt. Never spi1-2cs or spi1-3cs: their extra chip
+#   selects are GPIO17 (zone 1's relay) and GPIO16.
+# Relay pins are BCM numbers. GPIO17 = header pin 11, GPIO27 = header pin 13.
+zones:
+  zone1:
+    gpio_pin: 17          # SSR 1 terminal 3 (+); terminal 4 (-) to pin 14 GND
+    spi_bus: 0            # SPI0: CLK pin 23 / GPIO11, DO pin 21 / GPIO9
+    spi_chip_select: 0    # CS pin 24 / GPIO8 (CE0) -> /dev/spidev0.0
+    default_setpoint_f: 225.0
+
+  zone2:
+    gpio_pin: 27          # SSR 2 terminal 3 (+); terminal 4 (-) to pin 20 GND
+    spi_bus: 1            # SPI1: CLK pin 40 / GPIO21, DO pin 35 / GPIO19
+    spi_chip_select: 0    # CS pin 12 / GPIO18 (CE0) -> /dev/spidev1.0
+    default_setpoint_f: 225.0
+
+# ---------------------------------------------------------------------------
+# MAX31855 thermocouple boards (grill_probe.py); the bus is per zone above
+# ---------------------------------------------------------------------------
+spi:
+  max_speed_hz: 1000000   # both buses; the MAX31855 allows up to 5 MHz
+
+# ---------------------------------------------------------------------------
+# Control loop (main.py)
+# ---------------------------------------------------------------------------
+loop:
+  interval_seconds: 1.0   # one probe read, PID step, CSV row and live row
+
+# ---------------------------------------------------------------------------
+# PID tuning (pid_controller.py)
+# ---------------------------------------------------------------------------
+pid:
+  # Output is a duty cycle 0..1, so gains are small. STARTING POINTS only;
+  # tune from logged cooks.
+  kp: 0.05
+  ki: 0.0008
+  kd: 0.5
+  integral_limit: 0.6     # cap on the integral term's contribution to duty
+
+# ---------------------------------------------------------------------------
+# Relays (relay_driver.py): slow time-proportioning, suits SSR + element
+# ---------------------------------------------------------------------------
+relay:
+  window_seconds: 10.0    # duty 0.3 = on 3 s of every 10 s
+  min_on_seconds: 0.5     # shorter on-times are skipped (and longer offs filled)
+  failsafe_timeout_s: 5.0 # relay turns itself off if not refreshed this long
+
+# ---------------------------------------------------------------------------
+# Safety (safety.py)
+# ---------------------------------------------------------------------------
+safety:
+  max_temp_f: 300.0       # either zone above this: BOTH relays off
+  stale_seconds: 5.0      # no good reading this long: that zone's relay off
+  max_board_temp_f: 150.0 # MAX31855 cold junction (the enclosure) too hot: both off
+  max_setpoint_f: 285.0   # highest setpoint the UI may ask for
+  min_setpoint_f: 100.0
+
+# ---------------------------------------------------------------------------
+# Power (main.py). Each element draws ~10A at 120V, so both at full power is
+# ~20A: more than one 20A circuit should carry continuously (~16A). If both
+# zones share one circuit, set max_combined_duty to 1.6. 2.0 means no cap.
+# ---------------------------------------------------------------------------
+power:
+  max_combined_duty: 2.0
+
+# ---------------------------------------------------------------------------
+# Chef iQ wireless meat probes (chefiq_ble.py). Logged only, never control.
+# ---------------------------------------------------------------------------
+chefiq:
+  enabled: true
+  max_probes: 3
+  stale_seconds: 30.0     # a probe silent this long is logged as blank
+
+# ---------------------------------------------------------------------------
+# Files. Relative paths are relative to this file's folder (control/).
+# The Pi keeps cooks in ~/smoker/data; deploy.sh pull copies them to the Mac.
+# ---------------------------------------------------------------------------
+paths:
+  data_dir: "../data"
+  chefiq_raw_log: "../data/raw/chefiq_log.csv"    # chefiq_logger.py --raw output
+  chefiq_slots_file: "../data/chefiq_slots.json"  # probe MAC -> slot, remembered
+  gpio_lock_file: "/tmp/smoker-gpio.lock"  # held by whoever drives the relays
+  ssr_test_log: "../data/ssr_test.log"     # every ssr_test.py pulse, timestamped
+  command_token_file: "command_token"      # shared secret for cook commands
+
+# ---------------------------------------------------------------------------
+# Manual relay test (ssr_test.py). Test with the elements UNPLUGGED first.
+# ---------------------------------------------------------------------------
+ssr_test:
+  max_pulse_seconds: 5.0  # longest pulse it will do (hard cap 30 s in safety.py)
+  refresh_seconds: 1.0    # re-arms the relay failsafe during a pulse
+
+# ---------------------------------------------------------------------------
+# Live stream (live_server.py): rows out, cook commands in, over WebSocket.
+# A cook is started, paused and stopped from the UI; each cook gets a CSV
+# plus cook_..._meta.json.
+# ---------------------------------------------------------------------------
+websocket:
+  enabled: true
+  host: "0.0.0.0"
+  port: 8765
+  history_rows: 500       # kept so a client that drops off can resume
+  retry_seconds: 5.0      # wait before restarting a failed server (e.g. port busy)
+  max_pending_commands: 20  # commands queued for the control loop before "busy"
+  # Without a command token file the server streams rows but
+  # refuses every command.
+
+# ---------------------------------------------------------------------------
+# Simulation (main.py --simulate): fake probes, relays and grill
+# ---------------------------------------------------------------------------
+simulation:
+  start_temp_f: 70.0      # grill and probes start here
+  board_temp_f: 72.0      # fake MAX31855 cold-junction reading
+  ambient_f: 65.0         # outdoor air the grill loses heat to
+  heat_rate_f_per_s: 1.2  # temperature rise per second at full duty
+  loss_per_s: 0.004       # fraction of (grill - ambient) lost per second
+  speedup: 1.0            # >1 runs the fake grill faster than real time
+  # Fake Chef iQ probes (probe N in zone (N-1)%2+1): ambient follows the zone,
+  # food rises slowly toward it.
+  fake_probes: 2

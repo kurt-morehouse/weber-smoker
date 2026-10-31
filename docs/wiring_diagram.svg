@@ -1,0 +1,310 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1230" viewBox="0 0 1600 1230" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<title>Weber smoker controller wiring diagram</title>
+<rect width="1600" height="1230" fill="#ffffff"/>
+<text x="40" y="40" font-size="24" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Weber Genesis II dual-zone smoker: wiring</text>
+<text x="40" y="68" font-size="14" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Everything connected to the Raspberry Pi. Pin numbers are physical header positions; GPIO numbers are BCM. Matches control/config.yaml (each MAX31855 on its own SPI bus).</text>
+<rect x="40" y="110" width="300" height="790" rx="12" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+<text x="60" y="138" font-size="18" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Raspberry Pi</text>
+<text x="60" y="162" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">40-pin GPIO header</text>
+<text x="60" y="192" font-size="12" font-weight="600" fill="#0e7c86" text-anchor="start" dominant-baseline="central">Thermocouple 1 (SPI0)</text>
+<text x="60" y="422" font-size="12" font-weight="600" fill="#6e40c9" text-anchor="start" dominant-baseline="central">Thermocouple 2 (SPI1)</text>
+<text x="60" y="662" font-size="12" font-weight="600" fill="#bc4c00" text-anchor="start" dominant-baseline="central">Relay 1</text>
+<text x="60" y="792" font-size="12" font-weight="600" fill="#cf222e" text-anchor="start" dominant-baseline="central">Relay 2</text>
+<rect x="60" y="204" width="40" height="22" rx="4" fill="#0e7c86"/>
+<text x="80" y="215" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">1</text>
+<text x="110" y="215" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">3.3V</text>
+<polyline points="340,215 560,215" fill="none" stroke="#d1242f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="215" r="4.5" fill="#d1242f"/>
+<circle cx="560" cy="215" r="4.5" fill="#d1242f"/>
+<rect x="60" y="234" width="40" height="22" rx="4" fill="#0e7c86"/>
+<text x="80" y="245" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">6</text>
+<text x="110" y="245" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GND</text>
+<polyline points="340,245 560,245" fill="none" stroke="#24292f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="245" r="4.5" fill="#24292f"/>
+<circle cx="560" cy="245" r="4.5" fill="#24292f"/>
+<rect x="60" y="264" width="40" height="22" rx="4" fill="#0e7c86"/>
+<text x="80" y="275" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">21</text>
+<text x="110" y="275" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO9 · SPI0 MISO</text>
+<polyline points="340,275 560,275" fill="none" stroke="#1a7f37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="275" r="4.5" fill="#1a7f37"/>
+<circle cx="560" cy="275" r="4.5" fill="#1a7f37"/>
+<rect x="60" y="294" width="40" height="22" rx="4" fill="#0e7c86"/>
+<text x="80" y="305" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">24</text>
+<text x="110" y="305" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO8 · SPI0 CE0</text>
+<polyline points="340,305 560,305" fill="none" stroke="#8250df" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="305" r="4.5" fill="#8250df"/>
+<circle cx="560" cy="305" r="4.5" fill="#8250df"/>
+<rect x="60" y="324" width="40" height="22" rx="4" fill="#0e7c86"/>
+<text x="80" y="335" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">23</text>
+<text x="110" y="335" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO11 · SPI0 SCLK</text>
+<polyline points="340,335 560,335" fill="none" stroke="#0969da" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="335" r="4.5" fill="#0969da"/>
+<circle cx="560" cy="335" r="4.5" fill="#0969da"/>
+<rect x="60" y="434" width="40" height="22" rx="4" fill="#6e40c9"/>
+<text x="80" y="445" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">17</text>
+<text x="110" y="445" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">3.3V</text>
+<polyline points="340,445 560,445" fill="none" stroke="#d1242f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="445" r="4.5" fill="#d1242f"/>
+<circle cx="560" cy="445" r="4.5" fill="#d1242f"/>
+<rect x="60" y="464" width="40" height="22" rx="4" fill="#6e40c9"/>
+<text x="80" y="475" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">9</text>
+<text x="110" y="475" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GND</text>
+<polyline points="340,475 560,475" fill="none" stroke="#24292f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="475" r="4.5" fill="#24292f"/>
+<circle cx="560" cy="475" r="4.5" fill="#24292f"/>
+<rect x="60" y="494" width="40" height="22" rx="4" fill="#6e40c9"/>
+<text x="80" y="505" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">35</text>
+<text x="110" y="505" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO19 · SPI1 MISO</text>
+<polyline points="340,505 560,505" fill="none" stroke="#1a7f37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="505" r="4.5" fill="#1a7f37"/>
+<circle cx="560" cy="505" r="4.5" fill="#1a7f37"/>
+<rect x="60" y="524" width="40" height="22" rx="4" fill="#6e40c9"/>
+<text x="80" y="535" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">12</text>
+<text x="110" y="535" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO18 · SPI1 CE0</text>
+<polyline points="340,535 560,535" fill="none" stroke="#8250df" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="535" r="4.5" fill="#8250df"/>
+<circle cx="560" cy="535" r="4.5" fill="#8250df"/>
+<rect x="60" y="554" width="40" height="22" rx="4" fill="#6e40c9"/>
+<text x="80" y="565" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">40</text>
+<text x="110" y="565" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO21 · SPI1 SCLK</text>
+<polyline points="340,565 560,565" fill="none" stroke="#0969da" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="565" r="4.5" fill="#0969da"/>
+<circle cx="560" cy="565" r="4.5" fill="#0969da"/>
+<rect x="60" y="674" width="40" height="22" rx="4" fill="#bc4c00"/>
+<text x="80" y="685" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">11</text>
+<text x="110" y="685" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO17 · relay 1</text>
+<polyline points="340,685 560,685" fill="none" stroke="#bc4c00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="685" r="4.5" fill="#bc4c00"/>
+<circle cx="560" cy="685" r="4.5" fill="#bc4c00"/>
+<rect x="60" y="704" width="40" height="22" rx="4" fill="#bc4c00"/>
+<text x="80" y="715" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">14</text>
+<text x="110" y="715" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GND</text>
+<polyline points="340,715 560,715" fill="none" stroke="#24292f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="715" r="4.5" fill="#24292f"/>
+<circle cx="560" cy="715" r="4.5" fill="#24292f"/>
+<rect x="60" y="804" width="40" height="22" rx="4" fill="#cf222e"/>
+<text x="80" y="815" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">13</text>
+<text x="110" y="815" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO27 · relay 2</text>
+<polyline points="340,815 560,815" fill="none" stroke="#bc4c00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="815" r="4.5" fill="#bc4c00"/>
+<circle cx="560" cy="815" r="4.5" fill="#bc4c00"/>
+<rect x="60" y="834" width="40" height="22" rx="4" fill="#cf222e"/>
+<text x="80" y="845" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">20</text>
+<text x="110" y="845" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GND</text>
+<polyline points="340,845 560,845" fill="none" stroke="#24292f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="340" cy="845" r="4.5" fill="#24292f"/>
+<circle cx="560" cy="845" r="4.5" fill="#24292f"/>
+<text x="60" y="878" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central" font-style="italic">Built-in Bluetooth and Wi-Fi (no wires)</text>
+<rect x="560" y="170" width="230" height="190" rx="10" fill="#ffffff" stroke="#0e7c86" stroke-width="2"/>
+<text x="576" y="190" font-size="14" font-weight="600" fill="#0e7c86" text-anchor="start" dominant-baseline="central">MAX31855 #1 · zone 1</text>
+<text x="574" y="215" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Vin</text>
+<text x="574" y="245" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GND</text>
+<text x="574" y="275" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">DO (SO)</text>
+<text x="574" y="305" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">CS</text>
+<text x="574" y="335" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">CLK (SCK)</text>
+<text x="776" y="245" font-size="13" font-weight="600" fill="#1f2328" text-anchor="end" dominant-baseline="central">T+</text>
+<text x="776" y="305" font-size="13" font-weight="600" fill="#1f2328" text-anchor="end" dominant-baseline="central">T−</text>
+<polyline points="790,245 880,245 910,271.0" fill="none" stroke="#d4a72c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="790,305 880,305 910,279.0" fill="none" stroke="#cf222e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="790" cy="245" r="4.5" fill="#d4a72c"/>
+<circle cx="790" cy="305" r="4.5" fill="#cf222e"/>
+<rect x="910" y="268.0" width="230" height="14" rx="7" fill="#d0d7de" stroke="#8c959f"/>
+<circle cx="1140" cy="275.0" r="7" fill="#8c959f"/>
+<text x="910" y="245.0" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">K-type thermocouple · zone 1</text>
+<text x="910" y="305.0" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">+ yellow  ·  − red (US color code)</text>
+<text x="910" y="323.0" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">tip at grate level, away from the element</text>
+<rect x="560" y="400" width="230" height="190" rx="10" fill="#ffffff" stroke="#6e40c9" stroke-width="2"/>
+<text x="576" y="420" font-size="14" font-weight="600" fill="#6e40c9" text-anchor="start" dominant-baseline="central">MAX31855 #2 · zone 2</text>
+<text x="574" y="445" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Vin</text>
+<text x="574" y="475" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GND</text>
+<text x="574" y="505" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">DO (SO)</text>
+<text x="574" y="535" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">CS</text>
+<text x="574" y="565" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">CLK (SCK)</text>
+<text x="776" y="475" font-size="13" font-weight="600" fill="#1f2328" text-anchor="end" dominant-baseline="central">T+</text>
+<text x="776" y="535" font-size="13" font-weight="600" fill="#1f2328" text-anchor="end" dominant-baseline="central">T−</text>
+<polyline points="790,475 880,475 910,501.0" fill="none" stroke="#d4a72c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="790,535 880,535 910,509.0" fill="none" stroke="#cf222e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="790" cy="475" r="4.5" fill="#d4a72c"/>
+<circle cx="790" cy="535" r="4.5" fill="#cf222e"/>
+<rect x="910" y="498.0" width="230" height="14" rx="7" fill="#d0d7de" stroke="#8c959f"/>
+<circle cx="1140" cy="505.0" r="7" fill="#8c959f"/>
+<text x="910" y="475.0" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">K-type thermocouple · zone 2</text>
+<text x="910" y="535.0" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">+ yellow  ·  − red (US color code)</text>
+<text x="910" y="553.0" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">tip at grate level, away from the element</text>
+<rect x="1260" y="170" width="300" height="120" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="1280" y="196" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Chef iQ CQ60 meat probes</text>
+<text x="1280" y="220" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">up to 3, wireless</text>
+<text x="1280" y="244" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Bluetooth LE to the Pi's built-in</text>
+<text x="1280" y="266" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">radio. Logged only, never control.</text>
+<rect x="1260" y="400" width="300" height="120" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="1280" y="426" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Mac (backend + dashboard)</text>
+<text x="1280" y="450" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Wi-Fi to the Pi at 192.168.1.229</text>
+<text x="1280" y="474" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">SSH / rsync (deploy.sh)</text>
+<text x="1280" y="496" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">WebSocket live stream, port 8765</text>
+<line x1="400" y1="612" x2="1560" y2="612" stroke="#d0d7de" stroke-width="1.5" stroke-dasharray="8 6"/>
+<text x="400" y="630" font-size="13" font-weight="600" fill="#cf222e" text-anchor="start" dominant-baseline="central">Above: 3.3V logic   ·   Below: 120V AC mains (unplug before touching)</text>
+<rect x="560" y="650" width="230" height="110" rx="10" fill="#ffffff" stroke="#bc4c00" stroke-width="2"/>
+<text x="576" y="669" font-size="14" font-weight="600" fill="#bc4c00" text-anchor="start" dominant-baseline="central">SSR-25DA #1 · zone 1</text>
+<text x="574" y="685" font-size="13" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">3 +</text>
+<text x="574" y="715" font-size="13" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">4 −</text>
+<text x="606" y="700.0" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">DC in 3–32V</text>
+<text x="776" y="685" font-size="13" font-weight="600" fill="#1f2328" text-anchor="end" dominant-baseline="central">1 ~</text>
+<text x="776" y="715" font-size="13" font-weight="600" fill="#1f2328" text-anchor="end" dominant-baseline="central">2 ~</text>
+<text x="744" y="700.0" font-size="12" font-weight="400" fill="#57606a" text-anchor="end" dominant-baseline="central">AC out</text>
+<polyline points="790,685 900,685" fill="none" stroke="#24292f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="900" y="673" width="110" height="24" rx="4" fill="#fff8c5" stroke="#9a6700" stroke-width="1.5"/>
+<text x="955" y="685" font-size="12" font-weight="600" fill="#7d4e00" text-anchor="middle" dominant-baseline="central">15A breaker</text>
+<polyline points="1010,685 1240,685" fill="none" stroke="#24292f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="1240" cy="685" r="5" fill="#24292f"/>
+<polyline points="790,715 1050,715" fill="none" stroke="#24292f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1050,715 1060,705 1075,725 1090,705 1105,725 1120,705 1135,725 1150,705 1165,725 1180,715" fill="none" stroke="#cf222e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1115" y="741" font-size="12" font-weight="600" fill="#cf222e" text-anchor="middle" dominant-baseline="central">Element 1 · 1200W</text>
+<path d="M1180,715 L1232,715 A8,8 0 0 1 1248,715 L1310,715" fill="none" stroke="#8c959f" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1310" cy="715" r="5" fill="#8c959f"/>
+<circle cx="790" cy="685" r="4.5" fill="#24292f"/>
+<circle cx="790" cy="715" r="4.5" fill="#24292f"/>
+<rect x="560" y="780" width="230" height="110" rx="10" fill="#ffffff" stroke="#cf222e" stroke-width="2"/>
+<text x="576" y="799" font-size="14" font-weight="600" fill="#cf222e" text-anchor="start" dominant-baseline="central">SSR-25DA #2 · zone 2</text>
+<text x="574" y="815" font-size="13" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">3 +</text>
+<text x="574" y="845" font-size="13" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">4 −</text>
+<text x="606" y="830.0" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">DC in 3–32V</text>
+<text x="776" y="815" font-size="13" font-weight="600" fill="#1f2328" text-anchor="end" dominant-baseline="central">1 ~</text>
+<text x="776" y="845" font-size="13" font-weight="600" fill="#1f2328" text-anchor="end" dominant-baseline="central">2 ~</text>
+<text x="744" y="830.0" font-size="12" font-weight="400" fill="#57606a" text-anchor="end" dominant-baseline="central">AC out</text>
+<polyline points="790,815 900,815" fill="none" stroke="#24292f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="900" y="803" width="110" height="24" rx="4" fill="#fff8c5" stroke="#9a6700" stroke-width="1.5"/>
+<text x="955" y="815" font-size="12" font-weight="600" fill="#7d4e00" text-anchor="middle" dominant-baseline="central">15A breaker</text>
+<polyline points="1010,815 1240,815" fill="none" stroke="#24292f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="1240" cy="815" r="5" fill="#24292f"/>
+<polyline points="790,845 1050,845" fill="none" stroke="#24292f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1050,845 1060,835 1075,855 1090,835 1105,855 1120,835 1135,855 1150,835 1165,855 1180,845" fill="none" stroke="#cf222e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1115" y="871" font-size="12" font-weight="600" fill="#cf222e" text-anchor="middle" dominant-baseline="central">Element 2 · 1200W</text>
+<path d="M1180,845 L1232,845 A8,8 0 0 1 1248,845 L1310,845" fill="none" stroke="#8c959f" stroke-width="3" stroke-linecap="round"/>
+<circle cx="1310" cy="845" r="5" fill="#8c959f"/>
+<circle cx="790" cy="815" r="4.5" fill="#24292f"/>
+<circle cx="790" cy="845" r="4.5" fill="#24292f"/>
+<polyline points="1240,662 1240,1010" fill="none" stroke="#24292f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1310,662 1310,1010" fill="none" stroke="#8c959f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1380,662 1380,1010" fill="none" stroke="#1a7f37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1240" y="646" font-size="14" font-weight="700" fill="#24292f" text-anchor="middle" dominant-baseline="central">L</text>
+<text x="1310" y="646" font-size="14" font-weight="700" fill="#8c959f" text-anchor="middle" dominant-baseline="central">N</text>
+<text x="1380" y="646" font-size="14" font-weight="700" fill="#1a7f37" text-anchor="middle" dominant-baseline="central">G</text>
+<polyline points="1380,760 1420,760" fill="none" stroke="#1a7f37" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="1380" cy="760" r="5" fill="#1a7f37"/>
+<line x1="1420.0" y1="752" x2="1446.0" y2="752" stroke="#1a7f37" stroke-width="2.5"/>
+<line x1="1424.0" y1="759" x2="1442.0" y2="759" stroke="#1a7f37" stroke-width="2.5"/>
+<line x1="1428.0" y1="766" x2="1438.0" y2="766" stroke="#1a7f37" stroke-width="2.5"/>
+<text x="1460" y="742" font-size="12" font-weight="600" fill="#1a7f37" text-anchor="start" dominant-baseline="central">Bond to:</text>
+<text x="1460" y="760" font-size="12" font-weight="400" fill="#1a7f37" text-anchor="start" dominant-baseline="central">grill body</text>
+<text x="1460" y="778" font-size="12" font-weight="400" fill="#1a7f37" text-anchor="start" dominant-baseline="central">metal enclosure</text>
+<text x="1460" y="796" font-size="12" font-weight="400" fill="#1a7f37" text-anchor="start" dominant-baseline="central">element sheaths</text>
+<rect x="1190" y="1010" width="240" height="70" rx="10" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+<text x="1310" y="1034" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle" dominant-baseline="central">120V AC inlet / cord</text>
+<text x="1310" y="1058" font-size="12" font-weight="400" fill="#57606a" text-anchor="middle" dominant-baseline="central">via 30A terminal block (L, N, G)</text>
+<circle cx="1240" cy="1010" r="5" fill="#24292f"/>
+<circle cx="1310" cy="1010" r="5" fill="#8c959f"/>
+<circle cx="1380" cy="1010" r="5" fill="#1a7f37"/>
+<text x="1232" y="958" font-size="11" font-weight="400" fill="#57606a" text-anchor="end" dominant-baseline="central">black</text>
+<text x="1302" y="958" font-size="11" font-weight="400" fill="#57606a" text-anchor="end" dominant-baseline="central">white</text>
+<text x="1372" y="958" font-size="11" font-weight="400" fill="#57606a" text-anchor="end" dominant-baseline="central">green</text>
+<text x="560" y="920" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Zone wiring: 12 AWG high-temp. Each zone fused on the hot side, between L and SSR terminal 1.</text>
+<text x="560" y="940" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Both zones flat out ≈ 20A: use two circuits, or cap combined duty (power.max_combined_duty).</text>
+<rect x="40" y="920" width="300" height="60" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="1.5"/>
+<text x="60" y="942" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">5V 5A USB power supply</text>
+<text x="60" y="962" font-size="12" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">plugs into the Pi's USB power port</text>
+<polyline points="190,900 190,920" fill="none" stroke="#d1242f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="40" y="1030" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Header map (looking down, USB / Ethernet ports to the right)</text>
+<rect x="60" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="73" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">2</text>
+<rect x="60" y="1092" width="26" height="26" rx="5" fill="#0e7c86"/>
+<text x="73" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">1</text>
+<rect x="90" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="103" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">4</text>
+<rect x="90" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="103" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">3</text>
+<rect x="120" y="1060" width="26" height="26" rx="5" fill="#0e7c86"/>
+<text x="133" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">6</text>
+<rect x="120" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="133" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">5</text>
+<rect x="150" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="163" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">8</text>
+<rect x="150" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="163" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">7</text>
+<rect x="180" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="193" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">10</text>
+<rect x="180" y="1092" width="26" height="26" rx="5" fill="#6e40c9"/>
+<text x="193" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">9</text>
+<rect x="210" y="1060" width="26" height="26" rx="5" fill="#6e40c9"/>
+<text x="223" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">12</text>
+<rect x="210" y="1092" width="26" height="26" rx="5" fill="#bc4c00"/>
+<text x="223" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">11</text>
+<rect x="240" y="1060" width="26" height="26" rx="5" fill="#bc4c00"/>
+<text x="253" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">14</text>
+<rect x="240" y="1092" width="26" height="26" rx="5" fill="#cf222e"/>
+<text x="253" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">13</text>
+<rect x="270" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="283" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">16</text>
+<rect x="270" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="283" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">15</text>
+<rect x="300" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="313" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">18</text>
+<rect x="300" y="1092" width="26" height="26" rx="5" fill="#6e40c9"/>
+<text x="313" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">17</text>
+<rect x="330" y="1060" width="26" height="26" rx="5" fill="#cf222e"/>
+<text x="343" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">20</text>
+<rect x="330" y="1092" width="26" height="26" rx="5" fill="#eaeef2" stroke="#8c959f" stroke-dasharray="3 2"/>
+<text x="343" y="1105" font-size="11" font-weight="600" fill="#57606a" text-anchor="middle" dominant-baseline="central">19</text>
+<rect x="360" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="373" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">22</text>
+<rect x="360" y="1092" width="26" height="26" rx="5" fill="#0e7c86"/>
+<text x="373" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">21</text>
+<rect x="390" y="1060" width="26" height="26" rx="5" fill="#0e7c86"/>
+<text x="403" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">24</text>
+<rect x="390" y="1092" width="26" height="26" rx="5" fill="#0e7c86"/>
+<text x="403" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">23</text>
+<rect x="420" y="1060" width="26" height="26" rx="5" fill="#eaeef2" stroke="#8c959f" stroke-dasharray="3 2"/>
+<text x="433" y="1073" font-size="11" font-weight="600" fill="#57606a" text-anchor="middle" dominant-baseline="central">26</text>
+<rect x="420" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="433" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">25</text>
+<rect x="450" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="463" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">28</text>
+<rect x="450" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="463" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">27</text>
+<rect x="480" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="493" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">30</text>
+<rect x="480" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="493" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">29</text>
+<rect x="510" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="523" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">32</text>
+<rect x="510" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="523" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">31</text>
+<rect x="540" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="553" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">34</text>
+<rect x="540" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="553" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">33</text>
+<rect x="570" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="583" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">36</text>
+<rect x="570" y="1092" width="26" height="26" rx="5" fill="#6e40c9"/>
+<text x="583" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">35</text>
+<rect x="600" y="1060" width="26" height="26" rx="5" fill="#eaeef2" stroke="#8c959f" stroke-dasharray="3 2"/>
+<text x="613" y="1073" font-size="11" font-weight="600" fill="#57606a" text-anchor="middle" dominant-baseline="central">38</text>
+<rect x="600" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="613" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">37</text>
+<rect x="630" y="1060" width="26" height="26" rx="5" fill="#6e40c9"/>
+<text x="643" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">40</text>
+<rect x="630" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="643" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">39</text>
+<text x="54" y="1073" font-size="10" font-weight="400" fill="#8c959f" text-anchor="end" dominant-baseline="central">even</text>
+<text x="54" y="1105" font-size="10" font-weight="400" fill="#8c959f" text-anchor="end" dominant-baseline="central">odd</text>
+<rect x="700" y="1050" width="16" height="16" rx="3" fill="#0e7c86"/>
+<text x="724" y="1058" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Thermocouple 1 (SPI0)</text>
+<rect x="700" y="1072" width="16" height="16" rx="3" fill="#6e40c9"/>
+<text x="724" y="1080" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Thermocouple 2 (SPI1)</text>
+<rect x="700" y="1094" width="16" height="16" rx="3" fill="#bc4c00"/>
+<text x="724" y="1102" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Relay 1</text>
+<rect x="700" y="1116" width="16" height="16" rx="3" fill="#cf222e"/>
+<text x="724" y="1124" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Relay 2</text>
+<rect x="700" y="1138" width="16" height="16" rx="3" fill="#eaeef2" stroke="#8c959f" stroke-dasharray="3 2"/>
+<text x="724" y="1146" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Claimed by SPI, not wired: 19, 26, 38. Don't use.</text>
+<text x="40" y="1190" font-size="13" font-weight="600" fill="#cf222e" text-anchor="start" dominant-baseline="central">SPI1 needs dtoverlay=spi1-1cs in /boot/firmware/config.txt. Never spi1-2cs or spi1-3cs: their extra chip selects take GPIO17 (pin 11, relay 1) and GPIO16.</text>
+</svg>

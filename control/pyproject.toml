@@ -1,0 +1,23 @@
+[project]
+name = "smoker-control"
+version = "2.0.0"
+description = "Weber Genesis II dual-zone smoker controller (runs on the Raspberry Pi)"
+requires-python = ">=3.11"
+dependencies = [
+    "pyyaml>=6.0",
+    "websockets>=13.0",
+    "bleak>=0.22",
+]
+# RPi.GPIO and spidev come from apt on the Pi (python3-rpi.gpio,
+# python3-spidev). The venv is made with --system-site-packages so it sees
+# them. They are never installed on the Mac: there, use --simulate.
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.uv]
+package = false

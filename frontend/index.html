@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smoker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='%23c2410c'/></svg>">
+  <link rel="stylesheet" href="vendor/uPlot.min.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">Weber smoker</div>
+    <nav class="modes" role="tablist">
+      <button id="mode-replay" role="tab" aria-selected="true">Replay</button>
+      <button id="mode-live" role="tab" aria-selected="false">Live</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Replay controls -->
+    <section id="replay-bar" class="bar">
+      <label class="field">
+        <span>Cook</span>
+        <select id="cook-select"><option value="">Loading…</option></select>
+      </label>
+      <button id="play-btn" class="primary" disabled>Play</button>
+      <label class="field">
+        <span>Speed</span>
+        <select id="speed-select">
+          <option value="1">1×</option>
+          <option value="10">10×</option>
+          <option value="60" selected>60×</option>
+          <option value="300">300×</option>
+          <option value="1200">1200×</option>
+        </select>
+      </label>
+      <input id="scrub" type="range" min="0" max="0" value="0" disabled aria-label="Scrub through the cook">
+      <span id="replay-pos" class="muted mono">–</span>
+    </section>
+
+    <!-- Live status and controls -->
+    <section id="live-bar" class="bar" hidden>
+      <span id="live-conn" class="pill">connecting…</span>
+      <span id="live-age" class="mono muted"></span>
+      <span id="live-file" class="muted small"></span>
+      <span id="live-state" class="pill neutral">–</span>
+      <span class="spacer"></span>
+      <div id="live-controls" class="controls">
+        <div id="ctl-idle" class="ctl-group">
+          <input id="cook-name" type="text" placeholder="Cook name (e.g. brisket)" maxlength="60">
+          <label class="sp">Z1 <input id="sp1-start" type="number" min="100" max="285" step="5" value="225">°F</label>
+          <label class="sp">Z2 <input id="sp2-start" type="number" min="100" max="285" step="5" value="225">°F</label>
+          <button id="btn-start" class="primary">Start cook</button>
+        </div>
+        <div id="ctl-running" class="ctl-group" hidden>
+          <label class="sp">Z1 <input id="sp1" type="number" min="100" max="285" step="5">°F</label>
+          <label class="sp">Z2 <input id="sp2" type="number" min="100" max="285" step="5">°F</label>
+          <button id="btn-setpoints">Set</button>
+          <button id="btn-pause">Pause</button>
+          <button id="btn-resume" hidden>Resume</button>
+          <button id="btn-stop" class="danger">Stop</button>
+        </div>
+      </div>
+    </section>
+    <div id="message" class="message" hidden></div>
+    <div id="battery-warn" class="warn" hidden></div>
+    <div id="safety-warn" class="warn danger" hidden></div>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Grill zones</h2>
+        <span class="muted small">grill temperature against target; relay duty underneath</span>
+      </div>
+      <div id="chart-zones" class="chart"></div>
+      <div id="chart-duty" class="chart"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Meat probes</h2>
+        <label class="small"><input id="show-internal" type="checkbox"> Show t1–t4</label>
+      </div>
+      <div id="chart-probes" class="chart"></div>
+    </section>
+
+    <div class="two">
+      <section class="card">
+        <div class="card-head"><h2>Latest values</h2></div>
+        <table id="latest" class="latest"><tbody></tbody></table>
+      </section>
+
+      <section class="card" id="journal-card">
+        <div class="card-head">
+          <h2>Journal</h2>
+          <span id="journal-for" class="muted small">pick a cook</span>
+        </div>
+        <form id="journal-form" class="journal" hidden>
+          <label>Proteins <input id="j-proteins" type="text" placeholder="brisket, pork butt"></label>
+          <label>Setup <textarea id="j-setup" rows="2" placeholder="wood, rub, where things sat"></textarea></label>
+          <label>Outcome <textarea id="j-outcome" rows="2"></textarea></label>
+          <label>Rating
+            <select id="j-rating"><option value="">–</option><option>1</option><option>2</option>
+              <option>3</option><option>4</option><option>5</option></select></label>
+          <label>Notes <textarea id="j-notes" rows="3"></textarea></label>
+          <div class="row">
+            <button type="submit" class="primary">Save notes</button>
+            <span id="j-saved" class="muted small"></span>
+          </div>
+          <div class="photos-head">
+            <label class="file">Add photo <input id="j-photo" type="file" accept="image/*,.heic,.heif"></label>
+            <input id="j-caption" type="text" placeholder="caption (optional)" maxlength="200">
+          </div>
+          <div id="j-photos" class="photos"></div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="vendor/uPlot.iife.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
