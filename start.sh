@@ -6,15 +6,21 @@
 #   ./start.sh --offline    replay only; don't look for the Pi
 #   ./start.sh --probes     also run the Mac's Chef iQ logger (backup copy)
 #
-# SMOKER_PI_HOST / SMOKER_PI_PORT (the Pi, default 192.168.1.229:8765, the
-# same defaults as the backend) and SMOKER_PORT (the dashboard, default 8000).
+# The Pi's address, user and port come from pi.env (override for one run, e.g.
+# SMOKER_PI_HOST=192.168.1.50 ./start.sh). SMOKER_PORT: the dashboard (8000).
 #
 # First time: cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 set -uo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-PI_HOST="${SMOKER_PI_HOST:-192.168.1.229}"
-PI_PORT="${SMOKER_PI_PORT:-8765}"
+# pi.env gives defaults; variables already set in the environment win.
+while IFS='=' read -r key value; do
+    case "$key" in ''|\#*) continue ;; esac
+    [ -z "${!key:-}" ] && export "$key=$value"
+done < "$HERE/pi.env"
+PI_HOST="$SMOKER_PI_HOST"
+PI_USER="$SMOKER_PI_USER"
+PI_PORT="$SMOKER_PI_PORT"
 PORT="${SMOKER_PORT:-8000}"
 CHECK_TIMEOUT_S=2
 OFFLINE=0
@@ -48,14 +54,14 @@ else
     say "checking the Pi at $PI_HOST"
     if ! ping -c 1 -t "$CHECK_TIMEOUT_S" "$PI_HOST" >/dev/null 2>&1 && \
        ! ping -c 1 -W "$CHECK_TIMEOUT_S" "$PI_HOST" >/dev/null 2>&1; then
-        fail "the Pi at $PI_HOST doesn't answer. Is it on and on Wi-Fi? (SMOKER_PI_HOST to change it, --offline to replay without it)"
+        fail "the Pi at $PI_HOST doesn't answer. Is it on and on Wi-Fi? (change SMOKER_PI_HOST in pi.env, or --offline to replay without it)"
     fi
     if nc -z -G "$CHECK_TIMEOUT_S" "$PI_HOST" "$PI_PORT" >/dev/null 2>&1 || \
        nc -z -w "$CHECK_TIMEOUT_S" "$PI_HOST" "$PI_PORT" >/dev/null 2>&1; then
         say "Pi is streaming on port $PI_PORT"
     else
         say "Pi is reachable but nothing is listening on port $PI_PORT; the backend will keep retrying."
-        say "  check it with: ssh pi@$PI_HOST 'systemctl status smoker; journalctl -u smoker -n 40'"
+        say "  check it with: ssh $PI_USER@$PI_HOST 'systemctl status smoker; journalctl -u smoker -n 40'"
     fi
 fi
 export SMOKER_PI_HOST="$PI_HOST" SMOKER_PI_PORT="$PI_PORT"

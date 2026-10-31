@@ -1,8 +1,8 @@
 """Backend settings, from environment variables (all optional).
 
     SMOKER_DATA_DIR             cook CSVs to list and replay (default ../data)
-    SMOKER_PI_HOST              the Pi running control/main.py (default 192.168.1.229)
-    SMOKER_PI_PORT              its live WebSocket port (default 8765)
+    SMOKER_PI_HOST              the Pi running control/main.py (default: ../pi.env)
+    SMOKER_PI_PORT              its live WebSocket port (default: ../pi.env, else 8765)
     SMOKER_LIVE                 0 turns the live connection off (default 1)
     SMOKER_COMMAND_TOKEN        token for cook commands; default: the contents
                                 of ../control/command_token (the same file
@@ -15,6 +15,23 @@ from dataclasses import dataclass
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+PI_ENV = HERE.parent / "pi.env"
+
+
+def read_env_file(path):
+    """KEY=value lines from a file like pi.env ({} if it's missing)."""
+    out = {}
+    try:
+        lines = Path(path).read_text().splitlines()
+    except OSError:
+        return out
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        out[key.strip()] = value.strip().strip('"').strip("'")
+    return out
 
 
 class Reader:
@@ -71,11 +88,16 @@ def _token(r):
         return None
 
 
-def load(env=None):
-    r = Reader(os.environ if env is None else env)
+def load(env=None, pi_env=PI_ENV):
+    """Settings from the environment, with ../pi.env filling in what's unset."""
+    merged = read_env_file(pi_env)
+    merged.update({k: v for k, v in (os.environ if env is None else env).items() if v != ""})
+    if not merged.get("SMOKER_PI_HOST"):
+        raise ValueError(f"no SMOKER_PI_HOST: set it in {pi_env} or the environment")
+    r = Reader(merged)
     return Settings(
         data_dir=Path(r.text("SMOKER_DATA_DIR", str(HERE.parent / "data"))).expanduser().resolve(),
-        pi_host=r.text("SMOKER_PI_HOST", "192.168.1.229"),
+        pi_host=r.text("SMOKER_PI_HOST", None),
         pi_port=r.number("SMOKER_PI_PORT", 8765, int),
         live=r.flag("SMOKER_LIVE", True),
         command_token=_token(r),

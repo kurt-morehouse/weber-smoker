@@ -138,7 +138,7 @@
 <text x="1280" y="266" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">radio. Logged only, never control.</text>
 <rect x="1260" y="400" width="300" height="120" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="1280" y="426" font-size="14" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Mac (backend + dashboard)</text>
-<text x="1280" y="450" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Wi-Fi to the Pi at 192.168.1.229</text>
+<text x="1280" y="450" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Wi-Fi to the Pi (raspberrypi)</text>
 <text x="1280" y="474" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">SSH / rsync (deploy.sh)</text>
 <text x="1280" y="496" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">WebSocket live stream, port 8765</text>
 <line x1="400" y1="612" x2="1560" y2="612" stroke="#d0d7de" stroke-width="1.5" stroke-dasharray="8 6"/>

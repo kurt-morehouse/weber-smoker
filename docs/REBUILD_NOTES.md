@@ -39,7 +39,7 @@ Everything else was written again.
   zone 2 = GPIO27 + SPI1 (`/dev/spidev1.0`), that `ssr_test.py` touches only
   the chosen zone's pin and leaves it low on every exit path, and that a dead
   zone 2 board fails preflight with "no response".
-- `backend/`: 21 tests (settings, CSV parsing, replay player, journal with
+- `backend/`: 24 tests (settings, CSV parsing, replay player, journal with
   metadata stripping, the live relay against a fake Pi including reconnect and
   resume).
 - `analysis/`: merge test.

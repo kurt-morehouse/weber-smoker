@@ -15,10 +15,30 @@ from replay_player import Player
 
 
 # ------------------------------------------------------------- settings
-def test_settings_defaults(tmp_path):
-    s = settings_mod.load({"SMOKER_DATA_DIR": str(tmp_path)})
-    assert s.pi_url == "ws://192.168.1.229:8765"
+def test_settings_take_the_pi_from_pi_env(tmp_path):
+    env_file = tmp_path / "pi.env"
+    env_file.write_text("# comment\nSMOKER_PI_HOST=smokerpi\nSMOKER_PI_USER=kurt\nSMOKER_PI_PORT=8800\n")
+    s = settings_mod.load({"SMOKER_DATA_DIR": str(tmp_path)}, pi_env=env_file)
+    assert s.pi_url == "ws://smokerpi:8800"
     assert s.data_dir == tmp_path.resolve() and s.live
+
+
+def test_environment_beats_pi_env(tmp_path):
+    env_file = tmp_path / "pi.env"
+    env_file.write_text("SMOKER_PI_HOST=smokerpi\n")
+    s = settings_mod.load({"SMOKER_PI_HOST": "10.0.0.9"}, pi_env=env_file)
+    assert s.pi_url == "ws://10.0.0.9:8765"
+
+
+def test_no_pi_host_anywhere_is_an_error(tmp_path):
+    with pytest.raises(ValueError, match="SMOKER_PI_HOST"):
+        settings_mod.load({}, pi_env=tmp_path / "missing.env")
+
+
+def test_shipped_pi_env_matches_ssh_pi_at_raspberrypi():
+    vals = settings_mod.read_env_file(settings_mod.PI_ENV)
+    assert vals["SMOKER_PI_HOST"] == "raspberrypi" and vals["SMOKER_PI_USER"] == "pi"
+    assert vals["SMOKER_PI_DIR"] == "smoker" and vals["SMOKER_PI_PORT"] == "8765"
 
 
 def test_settings_overrides(tmp_path):

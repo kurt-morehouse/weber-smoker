@@ -86,7 +86,7 @@ Either feed each zone from its own circuit, or cap combined duty with
 |---|---|
 | Pi power | 5V 5A USB supply into the Pi's USB power port. Keep it separate from the AC zone wiring. |
 | Chef iQ CQ60 probes (up to 3) | Bluetooth LE to the Pi's built-in radio. Logged only, never used for control. |
-| Mac | Wi-Fi, Pi at 192.168.1.229: SSH and rsync (`deploy.sh`), live WebSocket on port 8765. |
+| Mac | Wi-Fi to the Pi (address in `pi.env`, `raspberrypi` by default): SSH and rsync (`deploy.sh`), live WebSocket on port 8765. |
 
 ## Turning on the SPI buses
 

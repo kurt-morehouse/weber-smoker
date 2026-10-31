@@ -11,14 +11,20 @@
 # overwrites a file that already exists here, so pull a cook after it has
 # finished (its metadata is rewritten until the cook stops).
 #
-# Override the target with PI_HOST / PI_DIR, e.g.
-#   PI_HOST=pi@raspberrypi.local ./deploy.sh
+# The Pi's address, user and folder come from pi.env. Override for one run with
+# the same names, e.g.  SMOKER_PI_HOST=192.168.1.50 ./deploy.sh
 
 set -euo pipefail
 
-PI_HOST="${PI_HOST:-pi@192.168.1.229}"
-PI_DIR="${PI_DIR:-smoker}"   # relative to the Pi user's home
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# pi.env gives defaults; variables already set in the environment win.
+while IFS='=' read -r key value; do
+    case "$key" in ''|\#*) continue ;; esac
+    [ -z "${!key:-}" ] && export "$key=$value"
+done < "$HERE/pi.env"
+
+PI_HOST="$SMOKER_PI_USER@$SMOKER_PI_HOST"
+PI_DIR="$SMOKER_PI_DIR"      # relative to the Pi user's home
 
 push() {
     echo "==> pushing control/ to $PI_HOST:$PI_DIR/control/"

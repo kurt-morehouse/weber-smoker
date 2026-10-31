@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One-time setup on the Pi: apt packages, SPI, venv, systemd service.
 #
-#   ~/smoker/control/install_service.sh
+#   ~/smoker/control/install_service.sh     (as the Pi user that will run it)
 #
 # Safe to run again: it only adds what's missing, then (re)starts the service.
 set -euo pipefail
@@ -47,8 +47,9 @@ if [ ! -s command_token ]; then
     echo "   Make one on the Mac (see README) and ./deploy.sh push." >&2
 fi
 
-echo "==> systemd service"
-sudo cp systemd/smoker.service /etc/systemd/system/smoker.service
+echo "==> systemd service (user $(id -un), folder $HERE)"
+sed -e "s|@USER@|$(id -un)|g" -e "s|@CONTROL_DIR@|$HERE|g" systemd/smoker.service.in \
+    | sudo tee /etc/systemd/system/smoker.service >/dev/null
 sudo systemctl daemon-reload
 sudo systemctl enable smoker
 

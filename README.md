@@ -56,22 +56,31 @@ uv run python main.py --simulate         # fake probes, relays and grill
 
 ### Pi
 
-Raspberry Pi OS (Bookworm or later), on Wi-Fi at 192.168.1.229, user `pi`.
+Raspberry Pi OS (Bookworm or later) on your Wi-Fi.
+
+**The Pi's address and user live in one file, [`pi.env`](pi.env)**
+(`SMOKER_PI_HOST=raspberrypi`, `SMOKER_PI_USER=pi`, `SMOKER_PI_DIR=smoker`).
+`deploy.sh`, `start.sh` and the backend all read it, so if your Pi's name,
+IP address or user changes, edit that file and nothing else. The commands
+below use the shipped values, `pi@raspberrypi`; substitute yours if you
+changed them.
 
 1. From the Mac, set up SSH keys (the old key was on the lost drive):
    ```bash
    ssh-keygen -t ed25519                  # if ~/.ssh/id_ed25519 doesn't exist
-   ssh-copy-id pi@192.168.1.229
+   ssh-copy-id pi@raspberrypi
    ```
 2. Push the code and install the service:
    ```bash
    ./deploy.sh push
-   ssh pi@192.168.1.229 '~/smoker/control/install_service.sh'
+   ssh pi@raspberrypi '~/smoker/control/install_service.sh'
    ```
    `install_service.sh` installs RPi.GPIO, spidev and BlueZ from apt, turns on
    SPI0 and SPI1 (`dtoverlay=spi1-1cs`, reboots if it had to add it), makes
-   the venv with uv and enables `smoker.service`.
-3. Watch it come up: `ssh pi@192.168.1.229 'journalctl -u smoker -f'`
+   the venv with uv, and installs and enables `smoker.service`, filling in
+   the user and folder it's run from (nothing in the service file is
+   hardcoded).
+3. Watch it come up: `ssh pi@raspberrypi 'journalctl -u smoker -f'`
 
 ## Running
 
@@ -83,7 +92,7 @@ live WebSocket, no cook CSV. A cook is started, paused and stopped from the
 dashboard.
 
 ```bash
-ssh pi@192.168.1.229
+ssh pi@raspberrypi
 sudo systemctl status smoker                        # or: journalctl -u smoker -f
 cd ~/smoker/control && .venv/bin/python preflight.py   # the hardware checks on their own
 ```
@@ -101,8 +110,8 @@ until it's fixed). `python settings.py` checks it by hand.
 
 ```bash
 ./deploy.sh push                                    # after changing control/
-ssh pi@192.168.1.229 'cd smoker/control && ~/.local/bin/uv sync'   # after dependency changes
-ssh pi@192.168.1.229 'sudo systemctl restart smoker'               # pick up the new code (ends a cook)
+ssh pi@raspberrypi 'cd smoker/control && ~/.local/bin/uv sync'   # after dependency changes
+ssh pi@raspberrypi 'sudo systemctl restart smoker'               # pick up the new code (ends a cook)
 ./deploy.sh pull                                    # copy finished cooks to data/
 ```
 
@@ -150,9 +159,9 @@ whether the backend can reach the Pi, how long ago the last row arrived
 (red after 5 s), and which file it's recording to. The backend connects to the
 Pi on startup and stays connected: it retries with backoff while the Pi is
 off, resumes by sequence number after a dropout, and records the stream to
-`data/live_<date>_<time>.csv`. Point it at the Pi with `SMOKER_PI_HOST`
-(default `192.168.1.229`) and `SMOKER_PI_PORT` (default `8765`), or set
-`SMOKER_LIVE=0` to turn it off.
+`data/live_<date>_<time>.csv`. It finds the Pi through `SMOKER_PI_HOST` and
+`SMOKER_PI_PORT` in `pi.env` (an environment variable of the same name
+overrides it for one run), or set `SMOKER_LIVE=0` to turn it off.
 
 The **Journal** card keeps notes and photos for the cook on screen, on the Mac
 only (`data/journal/<csv stem>/`): proteins, setup, outcome, rating, notes and

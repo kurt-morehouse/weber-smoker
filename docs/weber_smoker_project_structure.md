@@ -5,6 +5,7 @@ weber-smoker/
 ├── README.md                 # setup, running, the dashboard
 ├── deploy.sh                 # push control/ to the Pi, pull cooks back
 ├── start.sh                  # Mac: backend + dashboard (and optional probe logger)
+├── pi.env                    # the Pi's address, user and folder: the one place to change them
 │
 ├── control/                  # runs continuously on the Raspberry Pi (self-contained)
 │   ├── pyproject.toml        # Pi dependencies (uv)
@@ -26,7 +27,7 @@ weber-smoker/
 │   ├── preflight.py          # hardware checks before main.py starts
 │   ├── ssr_test.py           # manual one-zone relay pulse test
 │   ├── install_service.sh    # one-time Pi setup
-│   ├── systemd/smoker.service
+│   ├── systemd/smoker.service.in # filled in with the user and folder by install_service.sh
 │   ├── tools/relays_off.py   # forces both relay pins low (systemd ExecStopPost)
 │   ├── tools/start_stop_ssr.py   # older bare pin check
 │   └── tests/                # pytest, no hardware needed
