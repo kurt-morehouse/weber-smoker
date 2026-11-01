@@ -45,14 +45,17 @@ def decode_max31855(raw):
     Bits 2..0:   SCV (short to VCC), SCG (short to GND), OC (open circuit)
     """
     if raw == 0x00000000:
-        # No real reading looks like this: DO is stuck low (board unpowered,
-        # or DO shorted to ground).
-        raise ThermocoupleFault("no response from MAX31855: read 0x00000000, all zeros "
-                                "(board unpowered? check Vin/GND, then DO)", "spi_error")
+        # The board sent nothing. The Pi's MISO pins (GPIO9, GPIO19) have a
+        # pull-down, so an unpowered board, a loose or misplaced DO, CS or CLK
+        # wire, or unsoldered header pins all read as all zeros.
+        raise ThermocoupleFault(
+            "no response from MAX31855: read 0x00000000, all zeros (the board sent nothing: "
+            "check its header pins are soldered, 3.3V across Vin/GND, and DO on MISO, "
+            "CS and CLK on the right pins)", "spi_error")
     if raw == 0xFFFFFFFF:
-        # DO floating high: the Pi isn't hearing the board at all.
+        # DO stuck high: shorted to 3.3V, or a different chip answering.
         raise ThermocoupleFault("no response from MAX31855: read 0xFFFFFFFF, all ones "
-                                "(DO not connected? check DO, CLK and CS)", "spi_error")
+                                "(DO stuck high: shorted to 3.3V?)", "spi_error")
     if raw & 0x00010000:
         if raw & 0x1:
             raise ThermocoupleFault("thermocouple open circuit (unplugged?)", "open")

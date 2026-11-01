@@ -40,8 +40,8 @@ def test_faults(bits, kind):
     assert e.value.kind == kind
 
 
-@pytest.mark.parametrize("raw,hint", [(0x00000000, "all zeros.*Vin/GND"),
-                                      (0xFFFFFFFF, "all ones.*DO not connected")])
+@pytest.mark.parametrize("raw,hint", [(0x00000000, "all zeros.*soldered.*Vin/GND.*MISO"),
+                                      (0xFFFFFFFF, "all ones.*stuck high")])
 def test_no_response_says_which(raw, hint):
     with pytest.raises(ThermocoupleFault, match="no response") as e:
         decode_max31855(raw)
