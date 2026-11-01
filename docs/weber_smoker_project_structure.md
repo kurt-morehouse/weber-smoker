@@ -3,6 +3,7 @@
 ```
 weber-smoker/
 ├── README.md                 # setup, running, the dashboard
+├── DIAGNOSTICS.md            # troubleshooting, one part of the system at a time
 ├── deploy.sh                 # push control/ to the Pi, pull cooks back
 ├── start.sh                  # Mac: backend + dashboard (and optional probe logger)
 ├── pi.env                    # the Pi's address, user and folder: the one place to change them

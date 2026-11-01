@@ -27,6 +27,10 @@ and the WebSocket message formats at the top of `control/live_server.py` and
 
 Wiring: [`docs/wiring.md`](docs/wiring.md) and `docs/wiring_diagram.svg`.
 
+**Something not working?** [`DIAGNOSTICS.md`](DIAGNOSTICS.md) walks through
+each part of the system: power, network, the service, thermocouples, relays,
+Bluetooth, the live stream and the dashboard.
+
 ## Setting up from scratch
 
 ### Mac
