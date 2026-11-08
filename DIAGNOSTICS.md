@@ -139,6 +139,13 @@ on the Pi, `iw dev wlan0 link` shows signal strength, and
 
 ---
 
+**Pi enable Wi-Fi**:
+
+```bash
+sudo nmcli dev wifi connect "Morehousegnet" password "M0r3h0us34321!"
+  
+```
+
 ## 3. The smoker service and preflight
 
 `smoker.service` runs `preflight.py` first (`ExecStartPre`). If any check
@@ -174,8 +181,8 @@ cd ~/smoker/control && .venv/bin/python preflight.py
 
 | Check | Fails when | Go to |
 |---|---|---|
-| SPI | `/dev/spidev0.0` or `/dev/spidev1.0` missing | section 5 |
-| SPI1 overlay | no `dtoverlay=spi1-1cs`, or a forbidden 2cs/3cs one | section 5 |
+| SPI | `/dev/spidev0.0` or `/dev/spidev0.1` missing | section 5 |
+| SPI1 overlay | a forbidden `spi1-2cs`/`3cs` line (takes relay 1's pin) | section 5 |
 | MAX31855 zone1 / zone2 | the board doesn't answer, or the probe has a fault | section 5 |
 | GPIO library | RPi.GPIO won't load | below |
 | GPIO | can't set up the relay pins | section 6 |
@@ -232,7 +239,7 @@ It prints `config OK`, or every problem at once:
 | `... outside 1024..65535` | Value out of range |
 | `GPIO18 belongs to SPI1 CE0` | That pin is taken by SPI; pick another relay pin |
 | `both zones use the same gpio_pin` / `(spi_bus, spi_chip_select)` | Each zone needs its own |
-| `SPI1 only has chip select 0` | With spi1-1cs, zone 2 must use `spi_chip_select: 0` |
+| `SPI1 only has chip select 0` | Only if a zone is on SPI1: with spi1-1cs it must use `spi_chip_select: 0` |
 
 To start over: `git checkout control/config.yaml` restores the committed copy.
 
@@ -243,31 +250,32 @@ To start over: `git checkout control/config.yaml` restores the committed copy.
 | Zone | Bus | Vin | GND | DO (SO) | CS | CLK (SCK) | Device |
 |---|---|---|---|---|---|---|---|
 | 1 | SPI0 | pin 1 | pin 6 | pin 21 (GPIO9) | pin 24 (GPIO8) | pin 23 (GPIO11) | `/dev/spidev0.0` |
-| 2 | SPI1 | pin 17 | pin 9 | pin 35 (GPIO19) | pin 12 (GPIO18) | pin 40 (GPIO21) | `/dev/spidev1.0` |
+| 2 | SPI0 | pin 17 | pin 9 | pin 21 (GPIO9), shared | pin 26 (GPIO7) | pin 23 (GPIO11), shared | `/dev/spidev0.1` |
 
-Probe: **T+ yellow, T− red** (US colors).
+Both boards share SPI0: DO and CLK are jumpered together on pins 21 and 23,
+and each board has its own CS. Probe: **T+ yellow, T− red** (US colors).
 
 ### 5.1 SPI devices missing (preflight: SPI FAIL)
 
 ```bash
-ls /dev/spidev*                                   # want spidev0.0 and spidev1.0
+ls /dev/spidev*                                   # want spidev0.0 and spidev0.1
 grep -n "spi" /boot/firmware/config.txt           # /boot/config.txt on older OS
 ```
 
-- No `spidev0.*`: `sudo raspi-config nonint do_spi 0`, then reboot.
-- No `spidev1.0`: add `dtoverlay=spi1-1cs` to the boot config, then reboot.
+- No `spidev0.*`: `sudo raspi-config nonint do_spi 0`, then reboot. That
+  gives both `spidev0.0` and `spidev0.1`; SPI1 isn't needed.
 - **Never use `dtoverlay=spi1-2cs` or `spi1-3cs`.** Their extra chip selects
-  are GPIO17 (zone 1's relay) and GPIO16. Preflight fails if one is present.
+  are GPIO17 and GPIO16. Preflight fails if one is present.
 
 ### 5.2 Are the SPI pins assigned to SPI?
 
 ```bash
-pinctrl get 8-11,18-21          # older OS: raspi-gpio get 8-11 ; raspi-gpio get 18-21
+pinctrl get 7-11               # older OS: raspi-gpio get 7-11
 ```
 
-GPIO 8–11 should say `a0` (SPI0), GPIO 18–21 `a4` (SPI1). `ip` or `op`
+GPIO 7–11 should say `a0` (SPI0). `ip` or `op`
 means something else has taken the pin. Reboot and check again.
-`pinctrl get 17,27` must **not** say a0 or a4 (those are the relays).
+`pinctrl get 22,23` must **not** say a0 or a4 (those are the relays).
 
 ### 5.3 Read the raw values (Pi, service stopped)
 
@@ -275,8 +283,8 @@ means something else has taken the pin. Reboot and check again.
 cd ~/smoker/control
 .venv/bin/python - <<'EOF'
 import spidev
-for bus, name in ((0, "zone1 SPI0"), (1, "zone2 SPI1")):
-    s = spidev.SpiDev(); s.open(bus, 0); s.max_speed_hz = 500000; s.mode = 0
+for cs, name in ((0, "zone1 SPI0 CE0"), (1, "zone2 SPI0 CE1")):
+    s = spidev.SpiDev(); s.open(0, cs); s.max_speed_hz = 500000; s.mode = 0
     for _ in range(3):
         raw = int.from_bytes(bytes(s.xfer2([0]*4)), "big")
         tc = raw >> 18; tc = tc - 0x4000 if tc & 0x2000 else tc
@@ -302,33 +310,35 @@ Most likely first:
 
 1. **Header pins not soldered.** Boards often ship with the pins loose. A
    jumper pushed onto an unsoldered pin makes no reliable contact.
-2. **DO on MOSI instead of MISO.** DO goes to pin **21** (zone 1) or **35**
-   (zone 2), not pin 19 or 38.
+2. **DO on MOSI instead of MISO.** Both boards' DO go to pin **21**, not
+   pin 19.
 3. **No power.** Measure Vin to GND **on the board**: about 3.3V.
-4. **CS on the wrong pin** (24 for zone 1, 12 for zone 2). Without CS the
+4. **CS on the wrong pin** (24 for zone 1, 26 for zone 2). Without CS the
    board never drives DO.
-5. **CLK missing** (23 for zone 1, 40 for zone 2).
+5. **CLK missing** (pin 23 for both).
+6. **The other board drags the shared DO line.** If zone 1 stops reading as
+   soon as the zone 2 board is connected, the zone 2 board is faulty.
 
-**Loopback test: is it the Pi or the board?** Unplug the boards' DO wires.
-Put a jumper from **pin 19 to pin 21** (SPI0) and **pin 38 to pin 35** (SPI1),
-then:
+**Loopback test: is it the Pi or the board?** Unplug both boards' DO wires
+from pin 21. Put a jumper from **pin 19 to pin 21**, then:
 
 ```bash
 .venv/bin/python -c "
 import spidev
-for bus in (0, 1):
-    s = spidev.SpiDev(); s.open(bus, 0); s.max_speed_hz = 500000
-    print(f'SPI{bus}:', s.xfer2([0xA5, 0x5A, 0x12, 0x34])); s.close()"
+for cs in (0, 1):
+    s = spidev.SpiDev(); s.open(0, cs); s.max_speed_hz = 500000
+    print(f'SPI0 CE{cs}:', s.xfer2([0xA5, 0x5A, 0x12, 0x34])); s.close()"
 ```
 
-- `[165, 90, 18, 52]` on a bus: the Pi's SPI works, so the problem is that
-  board or its wiring.
-- `[0, 0, 0, 0]`: that bus isn't working on the Pi (5.1, 5.2).
+- `[165, 90, 18, 52]`: the Pi's SPI works, so the problem is that board or
+  its wiring.
+- `[0, 0, 0, 0]`: SPI0 isn't working on the Pi (5.1, 5.2).
 
 Remove the jumpers afterwards.
 
-**Swap test:** move zone 1's board onto zone 2's wires. If the fault moves
-with the board, it's the board. If it stays with the wires, it's the wiring.
+**Swap test:** swap the two boards' CS wires (pins 24 and 26). If the fault
+moves with the board, it's the board. If it stays with the CS pin, it's that
+wire or pin.
 
 ### 5.5 Readings that are wrong rather than missing
 
@@ -346,8 +356,8 @@ with the board, it's the board. If it stays with the wires, it's the wiring.
 
 | Zone | Pi pin | GPIO | SSR terminal | Ground |
 |---|---|---|---|---|
-| 1 | 11 | GPIO17 | SSR 1, terminal 3 (+) | pin 14 to terminal 4 (−) |
-| 2 | 13 | GPIO27 | SSR 2, terminal 3 (+) | pin 20 to terminal 4 (−) |
+| 1 | 15 | GPIO22 | SSR 1, terminal 3 (+) | pin 14 to terminal 4 (−) |
+| 2 | 16 | GPIO23 | SSR 2, terminal 3 (+) | pin 20 to terminal 4 (−) |
 
 Active-high: GPIO HIGH = SSR on. Terminals 1 and 2 are the AC switch.
 
@@ -358,7 +368,7 @@ sudo systemctl stop smoker
 cd ~/smoker/control && .venv/bin/python ssr_test.py
 ```
 
-It shows `1 = zone1 GPIO17 (pin 11)` and `2 = zone2 GPIO27 (pin 13)`. Pulse
+It shows `1 = zone1 GPIO22 (pin 15)` and `2 = zone2 GPIO23 (pin 16)`. Pulse
 each zone and watch **that SSR's LED** light, and only that one. Every pulse
 is logged:
 
@@ -374,7 +384,7 @@ tail -20 ~/smoker/data/ssr_test.log
 | `the relays are held by main.py` | Stop the service first (section 3) |
 | `only runs from an interactive terminal` | Run it in an ssh session, not through a script or pipe |
 
-**Pin check without the test tool:** `pinctrl get 17,27` shows `lo` (off) or
+**Pin check without the test tool:** `pinctrl get 22,23` shows `lo` (off) or
 `hi` (on). `tools/relays_off.py` forces both low at any time.
 
 ### 6.2 Relay pin HIGH at preflight ("Relays off" FAIL)
@@ -593,7 +603,7 @@ cd ~/smoker/control
   echo "== ip";         hostname -I
   echo "== code";       git -C ~/smoker log --oneline -1 2>/dev/null || ls -l ~/smoker/control/main.py
   echo "== spi";        ls /dev/spidev* 2>&1; grep -n "spi\|bt" /boot/firmware/config.txt
-  echo "== pins";       pinctrl get 8-11,17-21,27 2>/dev/null || raspi-gpio get 2>/dev/null | grep -E "GPIO (8|9|10|11|17|18|19|20|21|27):"
+  echo "== pins";       pinctrl get 7-11,22,23 2>/dev/null || raspi-gpio get 2>/dev/null | grep -E "GPIO (7|8|9|10|11|22|23):"
   echo "== bluetooth";  rfkill list bluetooth; bluetoothctl show 2>/dev/null | grep -E "Powered|Name"
   echo "== service";    systemctl status smoker --no-pager | head -5
   echo "== log";        journalctl -u smoker -n 25 --no-pager

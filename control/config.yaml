@@ -12,23 +12,25 @@
 # ---------------------------------------------------------------------------
 # Zones
 # ---------------------------------------------------------------------------
-# Each zone's MAX31855 has its own SPI bus, so no header pins are shared.
+# Both MAX31855 boards share SPI0 (CLK pin 23, DO pin 21); each has its own
+# CS: zone 1 CE0 (pin 24), zone 2 CE1 (pin 26).
 # The board reads /dev/spidev<spi_bus>.<spi_chip_select>.
 #   SPI0 needs dtparam=spi=on; SPI1 needs dtoverlay=spi1-1cs in
 #   /boot/firmware/config.txt. Never spi1-2cs or spi1-3cs: their extra chip
-#   selects are GPIO17 (zone 1's relay) and GPIO16.
-# Relay pins are BCM numbers. GPIO17 = header pin 11, GPIO27 = header pin 13.
+#   selects are GPIO17 and GPIO16.
+# Relay pins are BCM numbers. GPIO22 = header pin 15, GPIO23 = header pin 16.
+# (GPIO17 / pin 11 stopped driving its SSR on 2026-11-05, so the relays moved.)
 zones:
   zone1:
-    gpio_pin: 17          # SSR 1 terminal 3 (+); terminal 4 (-) to pin 14 GND
+    gpio_pin: 22          # pin 15 -> SSR 1 terminal 3 (+); terminal 4 (-) to pin 14 GND
     spi_bus: 0            # SPI0: CLK pin 23 / GPIO11, DO pin 21 / GPIO9
     spi_chip_select: 0    # CS pin 24 / GPIO8 (CE0) -> /dev/spidev0.0
     default_setpoint_f: 225.0
 
   zone2:
-    gpio_pin: 27          # SSR 2 terminal 3 (+); terminal 4 (-) to pin 20 GND
-    spi_bus: 1            # SPI1: CLK pin 40 / GPIO21, DO pin 35 / GPIO19
-    spi_chip_select: 0    # CS pin 12 / GPIO18 (CE0) -> /dev/spidev1.0
+    gpio_pin: 23          # pin 16 -> SSR 2 terminal 3 (+); terminal 4 (-) to pin 20 GND
+    spi_bus: 0            # SPI0, shared with zone 1: CLK pin 23 / GPIO11, DO pin 21 / GPIO9
+    spi_chip_select: 1    # CS pin 26 / GPIO7 (CE1) -> /dev/spidev0.1
     default_setpoint_f: 225.0
 
 # ---------------------------------------------------------------------------

@@ -1,13 +1,11 @@
 """MAX31855 (K-type) thermocouple reader over SPI.
 
-Each zone's board has its own SPI bus, so no header pins are shared:
-    zone 1: bus 0, device 0 -> SPI0 CE0 (/dev/spidev0.0)
-            CLK pin 23 / GPIO11, DO pin 21 / GPIO9, CS pin 24 / GPIO8
-    zone 2: bus 1, device 0 -> SPI1 CE0 (/dev/spidev1.0)
-            CLK pin 40 / GPIO21, DO pin 35 / GPIO19, CS pin 12 / GPIO18
-SPI0: sudo raspi-config nonint do_spi 0. SPI1: dtoverlay=spi1-1cs in
-/boot/firmware/config.txt, then reboot.
-Never spi1-2cs or spi1-3cs: SPI1 CE1 is GPIO17, zone 1's relay pin.
+Both boards share SPI0: CLK (pin 23 / GPIO11) and DO (pin 21 / GPIO9) are
+jumpered together; each board has its own chip select:
+    zone 1: bus 0, device 0 -> SPI0 CE0 (/dev/spidev0.0), CS pin 24 / GPIO8
+    zone 2: bus 0, device 1 -> SPI0 CE1 (/dev/spidev0.1), CS pin 26 / GPIO7
+SPI0: sudo raspi-config nonint do_spi 0, then reboot.
+Never add spi1-2cs or spi1-3cs: SPI1 CE1/CE2 are GPIO17/16.
 
 read() returns (probe_f, board_f) in Fahrenheit, or raises ThermocoupleFault.
 The control code treats a fault as "turn that zone's relay off".
@@ -45,7 +43,7 @@ def decode_max31855(raw):
     Bits 2..0:   SCV (short to VCC), SCG (short to GND), OC (open circuit)
     """
     if raw == 0x00000000:
-        # The board sent nothing. The Pi's MISO pins (GPIO9, GPIO19) have a
+        # The board sent nothing. The Pi's MISO pin (GPIO9) has a
         # pull-down, so an unpowered board, a loose or misplaced DO, CS or CLK
         # wire, or unsoldered header pins all read as all zeros.
         raise ThermocoupleFault(

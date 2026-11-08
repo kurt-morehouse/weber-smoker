@@ -100,17 +100,17 @@ def test_pause_logs_with_relays_off(tmp_path):
 
 def test_real_mode_uses_configured_buses_and_pins(tmp_path, monkeypatch):
     FakeSpiDev.opened.clear()
-    FakeSpiDev.frames = {(0, 0): encode_max31855(100, 25), (1, 0): encode_max31855(110, 25)}
+    FakeSpiDev.frames = {(0, 0): encode_max31855(100, 25), (0, 1): encode_max31855(110, 25)}
     monkeypatch.setattr(hardware, "load_spidev", lambda: type("M", (), {"SpiDev": FakeSpiDev}))
     gpio = FakeGPIO()
     cfg = config(tmp_path)
     ctl = main_mod.Controller(cfg, simulate=False, gpio=gpio, threaded=False, clock=ManualClock())
-    assert FakeSpiDev.opened == [(0, 0), (1, 0)]       # zone1 SPI0, zone2 SPI1
-    assert set(gpio.setup_pins) == {17, 27}            # zone1 GPIO17, zone2 GPIO27
+    assert FakeSpiDev.opened == [(0, 0), (0, 1)]       # zone1 SPI0 CE0, zone2 SPI0 CE1
+    assert set(gpio.setup_pins) == {22, 23}            # zone1 GPIO22, zone2 GPIO23
     row = ctl.step()
     assert row["zone1_temp_f"] == pytest.approx(212) and row["zone2_temp_f"] == pytest.approx(230)
     ctl.close()
-    assert gpio.levels == {17: 0, 27: 0}
+    assert gpio.levels == {22: 0, 23: 0}
 
 
 def test_main_refuses_without_hardware(tmp_path, monkeypatch, capsys):
@@ -228,17 +228,17 @@ def test_check_spi_finds_both_buses(tmp_path):
     dev = tmp_path / "dev"
     dev.mkdir()
     (dev / "spidev0.0").touch()
-    (dev / "spidev1.0").touch()
+    (dev / "spidev0.1").touch()
     c = preflight.check_spi(config(tmp_path), str(dev))
-    assert c.ok and "spidev0.0" in c.detail and "spidev1.0" in c.detail
+    assert c.ok and "spidev0.0" in c.detail and "spidev0.1" in c.detail
 
 
 def test_check_spi_hints_at_the_spi1_overlay(tmp_path):
     dev = tmp_path / "dev"
     dev.mkdir()
     (dev / "spidev0.0").touch()
-    (dev / "spidev0.1").touch()                  # the old shared-bus layout
-    c = preflight.check_spi(config(tmp_path), str(dev))
+    (dev / "spidev0.1").touch()                  # zone 2 moved to SPI1 here
+    c = preflight.check_spi(config(tmp_path, {"zones": {"zone2": {"spi_bus": 1, "spi_chip_select": 0}}}), str(dev))
     assert not c.ok and "spidev1.0" in c.detail and "spi1-1cs" in c.detail
 
 
@@ -247,21 +247,31 @@ def test_check_spi_hints_at_the_spi1_overlay(tmp_path):
 def test_overlay_check(tmp_path, line, ok):
     boot = tmp_path / "config.txt"
     boot.write_text(f"dtparam=spi=on\n{line}\n")
-    c = preflight.check_spi1_overlay(config(tmp_path), [str(boot)])
+    c = preflight.check_spi1_overlay(config(tmp_path, {"zones": {"zone2": {"spi_bus": 1, "spi_chip_select": 0}}}), [str(boot)])
     assert c.ok == ok
     if line.endswith(("2cs", "3cs")):
         assert "GPIO17" in c.detail
+
+
+@pytest.mark.parametrize("line,ok", [("dtoverlay=spi1-1cs", None), ("", None),
+                                     ("dtoverlay=spi1-3cs", False)])
+def test_overlay_check_without_spi1_zones(tmp_path, line, ok):
+    # Both zones on SPI0: spi1-1cs isn't needed, but 2cs/3cs still takes GPIO17.
+    boot = tmp_path / "config.txt"
+    boot.write_text(f"dtparam=spi=on\n{line}\n")
+    c = preflight.check_spi1_overlay(config(tmp_path), [str(boot)])
+    assert (c if c is None else c.ok) == ok
 
 
 def test_preflight_gpio_checks_only_relay_pins(tmp_path):
     g = FakeGPIO()
     checks = preflight.check_gpio(config(tmp_path), simulate=False, gpio=g)
     assert [c.ok for c in checks] == [True, True, True]
-    assert g.touched() == {17, 27} and g.mode == "BCM"
+    assert g.touched() == {22, 23} and g.mode == "BCM"
 
 
 def test_preflight_reports_dead_zone2(tmp_path, monkeypatch):
-    FakeSpiDev.frames = {(0, 0): encode_max31855(21, 20), (1, 0): 0}   # zone2 silent
+    FakeSpiDev.frames = {(0, 0): encode_max31855(21, 20), (0, 1): 0}   # zone2 silent
     monkeypatch.setattr(hardware, "load_spidev", lambda: type("M", (), {"SpiDev": FakeSpiDev}))
     cfg = config(tmp_path)
     assert preflight.check_thermocouple(cfg, "zone1", False).ok
@@ -278,7 +288,7 @@ class Log:
         self.lines.append(t)
 
 
-@pytest.mark.parametrize("zone,pin,physical", [("zone1", 17, 11), ("zone2", 27, 13)])
+@pytest.mark.parametrize("zone,pin,physical", [("zone1", 22, 15), ("zone2", 23, 16)])
 def test_pulse_drives_only_that_zones_pin(tmp_path, zone, pin, physical):
     g, clk, log = FakeGPIO(), ManualClock(), Log()
     held = ssr_test.pulse(config(tmp_path), zone, 2.0, False, log, gpio=g, clock=clk,
@@ -303,7 +313,7 @@ def test_pulse_turns_off_on_error(tmp_path):
         raise KeyboardInterrupt
     with pytest.raises(KeyboardInterrupt):
         ssr_test.pulse(config(tmp_path), "zone2", 3, False, log, gpio=g, clock=clk, sleep=boom)
-    assert g.levels[27] == 0 and log.lines[-1].startswith("OFF")
+    assert g.levels[23] == 0 and log.lines[-1].startswith("OFF")
 
 
 def test_ssr_test_refuses_without_a_terminal(tmp_path, capsys):
@@ -342,14 +352,14 @@ def test_relays_off_drives_both_relay_pins_low(tmp_path):
     sys.path.insert(0, str(main_mod.__file__).rsplit("/", 1)[0] + "/tools")
     import relays_off
     g = FakeGPIO()
-    g.levels = {17: 1, 27: 1}
+    g.levels = {22: 1, 23: 1}
     assert relays_off.main([str(write_config(tmp_path))], gpio=g) == 0
-    assert g.levels == {17: 0, 27: 0} and g.mode == "BCM" and g.touched() == {17, 27}
+    assert g.levels == {22: 0, 23: 0} and g.mode == "BCM" and g.touched() == {22, 23}
 
 
 def test_relays_off_without_config_uses_wired_pins(tmp_path):
     import relays_off
-    assert relays_off.relay_pins(str(tmp_path / "missing.yaml")) == [17, 27]
+    assert relays_off.relay_pins(str(tmp_path / "missing.yaml")) == [22, 23]
 
 
 def test_live_server_says_why_when_websockets_is_missing(monkeypatch):

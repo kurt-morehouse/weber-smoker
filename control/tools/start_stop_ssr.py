@@ -9,7 +9,7 @@ normal one-zone relay test use ssr_test.py instead.
 import time
 import RPi.GPIO as GPIO
 
-PINS = {"SSR 1 (zone 1)": 11, "SSR 2 (zone 2)": 13}   # physical pin numbers
+PINS = {"SSR 1 (zone 1)": 15, "SSR 2 (zone 2)": 16}   # physical pin numbers
 ON_SECONDS = 10
 
 GPIO.setwarnings(False)

@@ -35,8 +35,9 @@ Everything else was written again.
   time-proportioning and failsafe, PID, safety latches, power cap, Chef iQ
   decoding with real captures, cook lifecycle, live WebSocket server with
   history, resume and command tokens, preflight, ssr_test).
-  The tests confirm zone 1 = GPIO17 + SPI0 (`/dev/spidev0.0`) and
-  zone 2 = GPIO27 + SPI1 (`/dev/spidev1.0`), that `ssr_test.py` touches only
+  The tests confirm zone 1 = GPIO22 + SPI0 (`/dev/spidev0.0`) and
+  zone 2 = GPIO23 + SPI0 CE1 (`/dev/spidev0.1`, moved off SPI1 on
+  2026-11-04, sharing SPI0's DO/CLK), that `ssr_test.py` touches only
   the chosen zone's pin and leaves it low on every exit path, and that a dead
   zone 2 board fails preflight with "no response".
 - `backend/`: 24 tests (settings, CSV parsing, replay player, journal with
@@ -56,7 +57,7 @@ reach. Do them in this order, **elements unplugged** until step 5:
 1. `install_service.sh` on a fresh Pi OS: apt packages, SPI0, the SPI1
    overlay and reboot, venv, service.
 2. `preflight.py`: both thermocouples at room temperature, both relay pins
-   low, `spidev0.0` and `spidev1.0` present, Bluetooth hears the probes.
+   low, `spidev0.0` and `spidev0.1` present, Bluetooth hears the probes.
 3. `ssr_test.py`: each SSR's LED lights for its own zone only.
 4. Chef iQ probes on the Pi (bleak + BlueZ) and on the Mac
    (`chefiq_logger.py`): readings appear after the "Probe N" name packet.

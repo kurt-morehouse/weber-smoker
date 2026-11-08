@@ -80,7 +80,7 @@ changed them.
    ssh pi@raspberrypi '~/smoker/control/install_service.sh'
    ```
    `install_service.sh` installs RPi.GPIO, spidev and BlueZ from apt, turns on
-   SPI0 and SPI1 (`dtoverlay=spi1-1cs`, reboots if it had to add it), makes
+   SPI0 (both thermocouples share it; SPI1 is not used), makes
    the venv with uv, and installs and enables `smoker.service`, filling in
    the user and folder it's run from (nothing in the service file is
    hardcoded).
@@ -88,7 +88,8 @@ changed them.
 
 ## Running
 
-At boot `preflight.py` checks SPI (both buses), the SPI1 overlay, both
+At boot `preflight.py` checks SPI (`spidev0.0` and `spidev0.1`), that no
+SPI1 overlay takes relay 1's pin, both
 MAX31855 boards, RPi.GPIO, the relay pins and Bluetooth (PASS, FAIL or WARN
 for each). On any FAIL the service doesn't start and systemd retries every
 15 s. Then `main.py` starts IDLE: relays held off, readings streaming on the
@@ -135,8 +136,8 @@ sudo systemctl start smoker
 ```
 
 It only runs from a terminal, asks for the zone number again before each
-pulse, shows the GPIO and physical pin (zone 1 = GPIO17 = pin 11, zone 2 =
-GPIO27 = pin 13), refuses to start while `main.py` holds the relays (GPIO
+pulse, shows the GPIO and physical pin (zone 1 = GPIO22 = pin 15, zone 2 =
+GPIO23 = pin 16), refuses to start while `main.py` holds the relays (GPIO
 lock) and logs every pulse to `data/ssr_test.log`.
 
 `tools/start_stop_ssr.py` is the older bare pin check (both relays on for

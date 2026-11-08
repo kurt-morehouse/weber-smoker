@@ -2,12 +2,12 @@
 <title>Weber smoker controller wiring diagram</title>
 <rect width="1600" height="1230" fill="#ffffff"/>
 <text x="40" y="40" font-size="24" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Weber Genesis II dual-zone smoker: wiring</text>
-<text x="40" y="68" font-size="14" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Everything connected to the Raspberry Pi. Pin numbers are physical header positions; GPIO numbers are BCM. Matches control/config.yaml (each MAX31855 on its own SPI bus).</text>
+<text x="40" y="68" font-size="14" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">Everything connected to the Raspberry Pi. Pin numbers are physical header positions; GPIO numbers are BCM. Matches control/config.yaml (both MAX31855 on SPI0: DO and CLK shared, separate CS).</text>
 <rect x="40" y="110" width="300" height="790" rx="12" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
 <text x="60" y="138" font-size="18" font-weight="600" fill="#1f2328" text-anchor="start" dominant-baseline="central">Raspberry Pi</text>
 <text x="60" y="162" font-size="13" font-weight="400" fill="#57606a" text-anchor="start" dominant-baseline="central">40-pin GPIO header</text>
-<text x="60" y="192" font-size="12" font-weight="600" fill="#0e7c86" text-anchor="start" dominant-baseline="central">Thermocouple 1 (SPI0)</text>
-<text x="60" y="422" font-size="12" font-weight="600" fill="#6e40c9" text-anchor="start" dominant-baseline="central">Thermocouple 2 (SPI1)</text>
+<text x="60" y="192" font-size="12" font-weight="600" fill="#0e7c86" text-anchor="start" dominant-baseline="central">Thermocouple 1 (SPI0 CE0)</text>
+<text x="60" y="422" font-size="12" font-weight="600" fill="#6e40c9" text-anchor="start" dominant-baseline="central">Thermocouple 2 (SPI0 CE1, shares DO/CLK)</text>
 <text x="60" y="662" font-size="12" font-weight="600" fill="#bc4c00" text-anchor="start" dominant-baseline="central">Relay 1</text>
 <text x="60" y="792" font-size="12" font-weight="600" fill="#cf222e" text-anchor="start" dominant-baseline="central">Relay 2</text>
 <rect x="60" y="204" width="40" height="22" rx="4" fill="#0e7c86"/>
@@ -53,26 +53,26 @@
 <circle cx="340" cy="475" r="4.5" fill="#24292f"/>
 <circle cx="560" cy="475" r="4.5" fill="#24292f"/>
 <rect x="60" y="494" width="40" height="22" rx="4" fill="#6e40c9"/>
-<text x="80" y="505" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">35</text>
-<text x="110" y="505" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO19 · SPI1 MISO</text>
+<text x="80" y="505" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">21</text>
+<text x="110" y="505" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO9 · SPI0 MISO (shared)</text>
 <polyline points="340,505 560,505" fill="none" stroke="#1a7f37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="340" cy="505" r="4.5" fill="#1a7f37"/>
 <circle cx="560" cy="505" r="4.5" fill="#1a7f37"/>
 <rect x="60" y="524" width="40" height="22" rx="4" fill="#6e40c9"/>
-<text x="80" y="535" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">12</text>
-<text x="110" y="535" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO18 · SPI1 CE0</text>
+<text x="80" y="535" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">26</text>
+<text x="110" y="535" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO7 · SPI0 CE1</text>
 <polyline points="340,535 560,535" fill="none" stroke="#8250df" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="340" cy="535" r="4.5" fill="#8250df"/>
 <circle cx="560" cy="535" r="4.5" fill="#8250df"/>
 <rect x="60" y="554" width="40" height="22" rx="4" fill="#6e40c9"/>
-<text x="80" y="565" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">40</text>
-<text x="110" y="565" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO21 · SPI1 SCLK</text>
+<text x="80" y="565" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">23</text>
+<text x="110" y="565" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO11 · SPI0 SCLK (shared)</text>
 <polyline points="340,565 560,565" fill="none" stroke="#0969da" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="340" cy="565" r="4.5" fill="#0969da"/>
 <circle cx="560" cy="565" r="4.5" fill="#0969da"/>
 <rect x="60" y="674" width="40" height="22" rx="4" fill="#bc4c00"/>
-<text x="80" y="685" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">11</text>
-<text x="110" y="685" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO17 · relay 1</text>
+<text x="80" y="685" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">15</text>
+<text x="110" y="685" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO22 · relay 1</text>
 <polyline points="340,685 560,685" fill="none" stroke="#bc4c00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="340" cy="685" r="4.5" fill="#bc4c00"/>
 <circle cx="560" cy="685" r="4.5" fill="#bc4c00"/>
@@ -83,8 +83,8 @@
 <circle cx="340" cy="715" r="4.5" fill="#24292f"/>
 <circle cx="560" cy="715" r="4.5" fill="#24292f"/>
 <rect x="60" y="804" width="40" height="22" rx="4" fill="#cf222e"/>
-<text x="80" y="815" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">13</text>
-<text x="110" y="815" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO27 · relay 2</text>
+<text x="80" y="815" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">16</text>
+<text x="110" y="815" font-size="13" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">GPIO23 · relay 2</text>
 <polyline points="340,815 560,815" fill="none" stroke="#bc4c00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="340" cy="815" r="4.5" fill="#bc4c00"/>
 <circle cx="560" cy="815" r="4.5" fill="#bc4c00"/>
@@ -234,18 +234,18 @@
 <text x="193" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">10</text>
 <rect x="180" y="1092" width="26" height="26" rx="5" fill="#6e40c9"/>
 <text x="193" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">9</text>
-<rect x="210" y="1060" width="26" height="26" rx="5" fill="#6e40c9"/>
-<text x="223" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">12</text>
-<rect x="210" y="1092" width="26" height="26" rx="5" fill="#bc4c00"/>
-<text x="223" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">11</text>
+<rect x="210" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="223" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">12</text>
+<rect x="210" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="223" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">11</text>
 <rect x="240" y="1060" width="26" height="26" rx="5" fill="#bc4c00"/>
 <text x="253" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">14</text>
-<rect x="240" y="1092" width="26" height="26" rx="5" fill="#cf222e"/>
-<text x="253" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">13</text>
-<rect x="270" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
-<text x="283" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">16</text>
-<rect x="270" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
-<text x="283" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">15</text>
+<rect x="240" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="253" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">13</text>
+<rect x="270" y="1060" width="26" height="26" rx="5" fill="#cf222e"/>
+<text x="283" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">16</text>
+<rect x="270" y="1092" width="26" height="26" rx="5" fill="#bc4c00"/>
+<text x="283" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">15</text>
 <rect x="300" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
 <text x="313" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">18</text>
 <rect x="300" y="1092" width="26" height="26" rx="5" fill="#6e40c9"/>
@@ -262,8 +262,8 @@
 <text x="403" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">24</text>
 <rect x="390" y="1092" width="26" height="26" rx="5" fill="#0e7c86"/>
 <text x="403" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">23</text>
-<rect x="420" y="1060" width="26" height="26" rx="5" fill="#eaeef2" stroke="#8c959f" stroke-dasharray="3 2"/>
-<text x="433" y="1073" font-size="11" font-weight="600" fill="#57606a" text-anchor="middle" dominant-baseline="central">26</text>
+<rect x="420" y="1060" width="26" height="26" rx="5" fill="#6e40c9"/>
+<text x="433" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">26</text>
 <rect x="420" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
 <text x="433" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">25</text>
 <rect x="450" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
@@ -284,14 +284,14 @@
 <text x="553" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">33</text>
 <rect x="570" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
 <text x="583" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">36</text>
-<rect x="570" y="1092" width="26" height="26" rx="5" fill="#6e40c9"/>
-<text x="583" y="1105" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">35</text>
-<rect x="600" y="1060" width="26" height="26" rx="5" fill="#eaeef2" stroke="#8c959f" stroke-dasharray="3 2"/>
-<text x="613" y="1073" font-size="11" font-weight="600" fill="#57606a" text-anchor="middle" dominant-baseline="central">38</text>
+<rect x="570" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="583" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">35</text>
+<rect x="600" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="613" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">38</text>
 <rect x="600" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
 <text x="613" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">37</text>
-<rect x="630" y="1060" width="26" height="26" rx="5" fill="#6e40c9"/>
-<text x="643" y="1073" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">40</text>
+<rect x="630" y="1060" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
+<text x="643" y="1073" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">40</text>
 <rect x="630" y="1092" width="26" height="26" rx="5" fill="#ffffff" stroke="#d0d7de"/>
 <text x="643" y="1105" font-size="11" font-weight="400" fill="#8c959f" text-anchor="middle" dominant-baseline="central">39</text>
 <text x="54" y="1073" font-size="10" font-weight="400" fill="#8c959f" text-anchor="end" dominant-baseline="central">even</text>
@@ -299,12 +299,12 @@
 <rect x="700" y="1050" width="16" height="16" rx="3" fill="#0e7c86"/>
 <text x="724" y="1058" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Thermocouple 1 (SPI0)</text>
 <rect x="700" y="1072" width="16" height="16" rx="3" fill="#6e40c9"/>
-<text x="724" y="1080" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Thermocouple 2 (SPI1)</text>
+<text x="724" y="1080" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Thermocouple 2 (SPI0 CE1; also uses 21, 23)</text>
 <rect x="700" y="1094" width="16" height="16" rx="3" fill="#bc4c00"/>
 <text x="724" y="1102" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Relay 1</text>
 <rect x="700" y="1116" width="16" height="16" rx="3" fill="#cf222e"/>
 <text x="724" y="1124" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Relay 2</text>
 <rect x="700" y="1138" width="16" height="16" rx="3" fill="#eaeef2" stroke="#8c959f" stroke-dasharray="3 2"/>
-<text x="724" y="1146" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Claimed by SPI, not wired: 19, 26, 38. Don't use.</text>
-<text x="40" y="1190" font-size="13" font-weight="600" fill="#cf222e" text-anchor="start" dominant-baseline="central">SPI1 needs dtoverlay=spi1-1cs in /boot/firmware/config.txt. Never spi1-2cs or spi1-3cs: their extra chip selects take GPIO17 (pin 11, relay 1) and GPIO16.</text>
+<text x="724" y="1146" font-size="12" font-weight="400" fill="#1f2328" text-anchor="start" dominant-baseline="central">Claimed by SPI, not wired: 19. Don't use.</text>
+<text x="40" y="1190" font-size="13" font-weight="600" fill="#cf222e" text-anchor="start" dominant-baseline="central">Both boards share SPI0: DO (pin 21) and CLK (pin 23) jumpered together; zone 2 CS on pin 26. SPI1 isn't used. Never add spi1-2cs or spi1-3cs: they take GPIO17 and GPIO16. Pins 11 and 13 aren't used (pin 11 failed).</text>
 </svg>

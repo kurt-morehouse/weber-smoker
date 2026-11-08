@@ -16,7 +16,7 @@ weber-smoker/
 │   ├── main.py               # entry point: both zone loops, commands, live rows
 │   ├── pid_controller.py     # PID logic, one instance per zone
 │   ├── relay_driver.py       # GPIO time-proportioning of one SSR, with failsafe
-│   ├── grill_probe.py        # reads one MAX31855 (SPI0 / SPI1, one bus each)
+│   ├── grill_probe.py        # reads one MAX31855 (both on SPI0, CE0 / CE1)
 │   ├── safety.py             # per-zone fault, over-temp, stale data, power cap
 │   ├── cook.py               # IDLE / COOKING / PAUSED and the cook commands
 │   ├── data_logger.py        # writes synchronized rows to CSV at a fixed interval
@@ -65,32 +65,31 @@ and the message formats documented at the top of `control/live_server.py`,
 
 | Zone | Element | Relay | Grill thermocouple | Drives |
 |---|---|---|---|---|
-| 1 | 1200W (~10A at 120V) | SSR 1, GPIO17 (pin 11) | MAX31855 #1 (SPI0 CE0, `/dev/spidev0.0`) | its own PID loop |
-| 2 | 1200W (~10A at 120V) | SSR 2, GPIO27 (pin 13) | MAX31855 #2 (SPI1 CE0, `/dev/spidev1.0`) | its own PID loop |
+| 1 | 1200W (~10A at 120V) | SSR 1, GPIO22 (pin 15) | MAX31855 #1 (SPI0 CE0, `/dev/spidev0.0`) | its own PID loop |
+| 2 | 1200W (~10A at 120V) | SSR 2, GPIO23 (pin 16) | MAX31855 #2 (SPI0 CE1, `/dev/spidev0.1`) | its own PID loop |
 
 ### Thermocouple wiring
 
-Each board has its own SPI bus; no header pins are shared.
+Both boards share SPI0: CLK and DO are jumpered together; each has its own CS.
 
 | Zone | Bus | CLK | DO (MISO) | CS | Device |
 |---|---|---|---|---|---|
 | 1 | SPI0 | pin 23 / GPIO11 | pin 21 / GPIO9 | pin 24 / GPIO8 (CE0) | `/dev/spidev0.0` |
-| 2 | SPI1 | pin 40 / GPIO21 | pin 35 / GPIO19 | pin 12 / GPIO18 (CE0) | `/dev/spidev1.0` |
+| 2 | SPI0 | pin 23 / GPIO11 (shared) | pin 21 / GPIO9 (shared) | pin 26 / GPIO7 (CE1) | `/dev/spidev0.1` |
 
 Power: zone 1 board on pin 1 (3.3V) + pin 6 (GND), zone 2 on pin 17 (3.3V) +
-pin 9 (GND). The MAX31855 has no data-in line, so SPI1 MOSI (pin 38 / GPIO20)
-is not wired, but the overlay still claims it. The bus and chip select are
+pin 9 (GND). The MAX31855 has no data-in line, so SPI0 MOSI (pin 19 / GPIO10)
+is not wired, but the SPI driver still claims it. The bus and chip select are
 `zones.<zone>.spi_bus` / `spi_chip_select` in `control/config.yaml`.
 
-SPI0 is turned on with `sudo raspi-config nonint do_spi 0` (`dtparam=spi=on`).
-SPI1 needs `dtoverlay=spi1-1cs` in `/boot/firmware/config.txt`
-(`/boot/config.txt` before Bookworm), then a reboot.
+SPI0 is turned on with `sudo raspi-config nonint do_spi 0` (`dtparam=spi=on`),
+which gives both `spidev0.0` and `spidev0.1`. SPI1 isn't used.
 
-**Use `spi1-1cs`, never `spi1-2cs` or `spi1-3cs`.** SPI1 CE1 is GPIO17 and CE2
-is GPIO16; GPIO17 is zone 1's relay pin, and a 2cs/3cs overlay hands it to the
-SPI driver. `settings.py` refuses a relay pin on a bus in use (SPI0: GPIO 7-11,
+**If SPI1 is ever enabled, use `spi1-1cs`, never `spi1-2cs` or `spi1-3cs`.** SPI1 CE1 is GPIO17 and CE2
+is GPIO16; a 2cs/3cs overlay hands them to the SPI driver (GPIO17 was zone 1's
+relay pin before the relays moved to GPIO22/23). `settings.py` refuses a relay pin on a bus in use (SPI0: GPIO 7-11,
 SPI1: GPIO 18-21) and any SPI1 chip select but 0; `preflight.py` fails if the
-boot config has a 2cs/3cs overlay.
+boot config has a 2cs/3cs overlay, whether or not a zone uses SPI1.
 
 Chef iQ probes monitor the meat only. They are logged alongside the grill
 temps but never drive the relays.

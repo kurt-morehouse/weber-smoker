@@ -19,14 +19,13 @@ BOOT=/boot/firmware/config.txt
 [ -f "$BOOT" ] || BOOT=/boot/config.txt
 REBOOT=0
 if grep -Eq '^\s*dtoverlay=spi1-(2|3)cs' "$BOOT"; then
-    echo "!! $BOOT has spi1-2cs/3cs: that takes GPIO17 (relay 1). Fix it by hand." >&2
+    echo "!! $BOOT has spi1-2cs/3cs: that takes GPIO17 and GPIO16. Fix it by hand." >&2
     exit 1
 fi
-if ! grep -Eq '^\s*dtoverlay=spi1-1cs' "$BOOT"; then
-    echo "==> SPI1: adding dtoverlay=spi1-1cs to $BOOT (backup at $BOOT.bak)"
-    sudo cp "$BOOT" "$BOOT.bak"
-    echo "dtoverlay=spi1-1cs" | sudo tee -a "$BOOT" >/dev/null
-    REBOOT=1
+# Both thermocouples are on SPI0 (CE0/CE1), so SPI1 is not enabled. It isn't
+# needed, and on the Pi 3 the onboard Bluetooth stopped answering while it was on.
+if grep -Eq '^\s*dtoverlay=spi1-1cs' "$BOOT"; then
+    echo "==> note: $BOOT still has dtoverlay=spi1-1cs, which nothing uses. Remove it if Bluetooth fails."
 fi
 
 echo "==> uv"

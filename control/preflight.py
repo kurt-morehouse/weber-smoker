@@ -63,8 +63,9 @@ def check_spi(cfg, dev_dir="/dev"):
 
 
 def check_spi1_overlay(cfg, boot_configs=BOOT_CONFIGS):
-    if not any(cfg["zones"][z]["spi_bus"] == 1 for z in ZONES):
-        return None
+    """A spi1-2cs/3cs overlay always fails (it takes GPIO17/16), even
+    when no zone uses SPI1. spi1-1cs is only required if a zone is on SPI1."""
+    spi1_used = any(cfg["zones"][z]["spi_bus"] == 1 for z in ZONES)
     for path in boot_configs:
         p = Path(path)
         if not p.exists():
@@ -74,11 +75,15 @@ def check_spi1_overlay(cfg, boot_configs=BOOT_CONFIGS):
                or ln.startswith("dtoverlay=spi1-3cs")]
         if bad:
             return Check("SPI1 overlay", False,
-                         f"{path} has {bad[0]}: its extra chip selects take GPIO17 (relay 1) "
+                         f"{path} has {bad[0]}: its extra chip selects take GPIO17 "
                          f"and GPIO16. Use dtoverlay=spi1-1cs only")
+        if not spi1_used:
+            return None
         if any(ln.startswith("dtoverlay=spi1-1cs") for ln in lines):
             return Check("SPI1 overlay", True, f"dtoverlay=spi1-1cs in {path}")
         return Check("SPI1 overlay", False, f"no dtoverlay=spi1-1cs in {path}")
+    if not spi1_used:
+        return None
     return Check("SPI1 overlay", True, "no boot config found (not a Pi?)", warn_only=True)
 
 

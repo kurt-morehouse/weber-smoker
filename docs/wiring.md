@@ -4,8 +4,9 @@
 
 `wiring_diagram.png` is the same diagram as an image, for printing.
 
-This matches `control/config.yaml`: each MAX31855 has its own SPI bus, so no
-header pins are shared. Pin numbers are physical header positions; GPIO
+This matches `control/config.yaml`: both MAX31855 boards share SPI0. Their DO
+and CLK wires are jumpered together on pins 21 and 23; each board has its own
+chip select (zone 1 CE0 on pin 24, zone 2 CE1 on pin 26). Pin numbers are physical header positions; GPIO
 numbers are BCM.
 
 ## Raspberry Pi header connections
@@ -19,27 +20,33 @@ numbers are BCM.
 | 23 | GPIO11 · SPI0 SCLK | MAX31855 #1 CLK (may be labeled SCK) | clock |
 | 17 | 3.3V | MAX31855 #2 Vin | power |
 | 9 | GND | MAX31855 #2 GND | ground |
-| 35 | GPIO19 · SPI1 MISO | MAX31855 #2 DO (SO) | data |
-| 12 | GPIO18 · SPI1 CE0 | MAX31855 #2 CS | chip select |
-| 40 | GPIO21 · SPI1 SCLK | MAX31855 #2 CLK (SCK) | clock |
-| 11 | GPIO17 | SSR #1 terminal 3 (+) | relay 1 control |
+| 21 | GPIO9 · SPI0 MISO | MAX31855 #2 DO (SO), jumpered with #1 | data (shared) |
+| 26 | GPIO7 · SPI0 CE1 | MAX31855 #2 CS (never shared) | chip select |
+| 23 | GPIO11 · SPI0 SCLK | MAX31855 #2 CLK (SCK), jumpered with #1 | clock (shared) |
+| 15 | GPIO22 | SSR #1 terminal 3 (+) | relay 1 control |
 | 14 | GND | SSR #1 terminal 4 (−) | ground |
-| 13 | GPIO27 | SSR #2 terminal 3 (+) | relay 2 control |
+| 16 | GPIO23 | SSR #2 terminal 3 (+) | relay 2 control |
 | 20 | GND | SSR #2 terminal 4 (−) | ground |
 
-**Claimed by SPI, not wired, don't use:** pin 19 (GPIO10, SPI0 MOSI), pin 26
-(GPIO7, SPI0 CE1) and pin 38 (GPIO20, SPI1 MOSI). The MAX31855 has no data-in
-line, so the MOSI pins stay empty, but the SPI drivers still own them.
+**Don't use pin 11 (GPIO17) or pin 13 (GPIO27):** pin 11 stopped driving its SSR
+on 2026-11-05 (pin 13 untested since), so the relays moved to pins 15 and 16.
+
+**Claimed by SPI, not wired, don't use:** pin 19 (GPIO10, SPI0 MOSI). The
+MAX31855 has no data-in line, so MOSI stays empty, but the SPI driver still
+owns it. Pins 12, 35 and 40 (SPI1) are no longer used.
 
 `settings.py` refuses a relay pin on an SPI bus in use (SPI0: GPIO 7–11,
-SPI1: GPIO 18–21).
+SPI1: GPIO 18–21 if a zone is ever put back on SPI1).
+
+If zone 1 stops reading as soon as the zone 2 board is connected, the zone 2
+board is faulty and is pulling the shared DO line: unplug and replace it.
 
 ## Thermocouples
 
 | Zone | MAX31855 | Thermocouple | Placement |
 |---|---|---|---|
-| 1 | #1, SPI0, `/dev/spidev0.0` | K-type, T+ yellow, T− red | grate level near element 1, out of direct radiant heat |
-| 2 | #2, SPI1, `/dev/spidev1.0` | K-type, T+ yellow, T− red | grate level near element 2, out of direct radiant heat |
+| 1 | #1, SPI0 CE0, `/dev/spidev0.0` | K-type, T+ yellow, T− red | grate level near element 1, out of direct radiant heat |
+| 2 | #2, SPI0 CE1, `/dev/spidev0.1` | K-type, T+ yellow, T− red | grate level near element 2, out of direct radiant heat |
 
 Yellow + and red − is the US (ANSI) color code. If a reading falls when you
 warm the probe, the two leads are swapped.
@@ -88,18 +95,16 @@ Either feed each zone from its own circuit, or cap combined duty with
 | Chef iQ CQ60 probes (up to 3) | Bluetooth LE to the Pi's built-in radio. Logged only, never used for control. |
 | Mac | Wi-Fi to the Pi (address in `pi.env`, `raspberrypi` by default): SSH and rsync (`deploy.sh`), live WebSocket on port 8765. |
 
-## Turning on the SPI buses
+## Turning on SPI
 
-SPI0: `sudo raspi-config nonint do_spi 0` (adds `dtparam=spi=on`).
+SPI0: `sudo raspi-config nonint do_spi 0` (adds `dtparam=spi=on`). That gives
+both chip selects, `spidev0.0` (zone 1) and `spidev0.1` (zone 2). SPI1 isn't
+needed; a leftover `dtoverlay=spi1-1cs` line is harmless.
 
-SPI1: add `dtoverlay=spi1-1cs` to `/boot/firmware/config.txt`
-(`/boot/config.txt` before Bookworm), then reboot.
+**Never add `dtoverlay=spi1-2cs` or `spi1-3cs`.** Their extra chip selects
+are GPIO17 (pin 11) and GPIO16, so the SPI driver would take those pins.
 
-**Use `spi1-1cs`, never `spi1-2cs` or `spi1-3cs`.** Their extra chip selects
-are GPIO17 (pin 11, relay 1) and GPIO16, so they would hand relay 1's pin to
-the SPI driver.
-
-After rebooting, `ls /dev/spidev*` should list `spidev0.0` and `spidev1.0`.
+After rebooting, `ls /dev/spidev*` should list `spidev0.0` and `spidev0.1`.
 Then run `preflight.py`.
 
 ## Before powering up

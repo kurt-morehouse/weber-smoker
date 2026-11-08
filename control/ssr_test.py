@@ -8,8 +8,8 @@ exactly as asked.
     cd ~/smoker/control && .venv/bin/python ssr_test.py
     uv run python ssr_test.py --simulate    # on the Mac, no hardware
 
-Zone 1 = GPIO17 = header pin 11 -> SSR 1 terminal 3 (+)
-Zone 2 = GPIO27 = header pin 13 -> SSR 2 terminal 3 (+)
+Zone 1 = GPIO22 = header pin 15 -> SSR 1 terminal 3 (+)
+Zone 2 = GPIO23 = header pin 16 -> SSR 2 terminal 3 (+)
 (the pins come from config.yaml; the physical pin is shown for checking)
 
 It is deliberately hard to misuse:

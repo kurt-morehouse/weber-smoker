@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import hardware  # noqa: E402
 from settings import ZONES, ConfigError, load_config  # noqa: E402
 
-FALLBACK_PINS = (17, 27)       # if config.yaml can't be read, use the wired pins
+FALLBACK_PINS = (22, 23)       # if config.yaml can't be read, use the wired pins
 
 
 def relay_pins(cfg_path=None):

@@ -21,7 +21,7 @@ BCM_PINS = (2, 27)          # usable BCM GPIO numbers on the 40-pin header
 SPI_BUSES = (0, 1)
 SPI_CHIP_SELECTS = (0, 1)   # CE0 / CE1
 # SPI1 is enabled with dtoverlay=spi1-1cs, which creates only CE0;
-# spi1-2cs/3cs would add CE1 = GPIO17, zone 1's relay pin.
+# spi1-2cs/3cs would add CE1 = GPIO17 (relay 1's old pin).
 SPI1_CHIP_SELECTS = (0,)
 # Pins an SPI bus owns once enabled. A relay must not use them.
 SPI_BUS_PINS = {

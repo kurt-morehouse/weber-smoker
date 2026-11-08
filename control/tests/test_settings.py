@@ -6,14 +6,14 @@ from settings import ConfigError, load_config
 
 def test_shipped_config_loads():
     cfg = load_config()
-    assert cfg["zones"]["zone1"]["gpio_pin"] == 17
-    assert cfg["zones"]["zone2"]["gpio_pin"] == 27
+    assert cfg["zones"]["zone1"]["gpio_pin"] == 22
+    assert cfg["zones"]["zone2"]["gpio_pin"] == 23
 
 
 def test_shipped_config_matches_the_wiring():
     z = load_config()["zones"]
     assert (z["zone1"]["spi_bus"], z["zone1"]["spi_chip_select"]) == (0, 0)   # /dev/spidev0.0
-    assert (z["zone2"]["spi_bus"], z["zone2"]["spi_chip_select"]) == (1, 0)   # /dev/spidev1.0
+    assert (z["zone2"]["spi_bus"], z["zone2"]["spi_chip_select"]) == (0, 1)   # /dev/spidev0.1, shares SPI0
 
 
 def test_paths_resolved_relative_to_config(tmp_path):
@@ -48,7 +48,7 @@ def test_wrong_type(tmp_path):
 
 
 def test_same_relay_pin(tmp_path):
-    expect_problem(tmp_path, "same gpio_pin", {"zones": {"zone2": {"gpio_pin": 17}}})
+    expect_problem(tmp_path, "same gpio_pin", {"zones": {"zone2": {"gpio_pin": 22}}})
 
 
 def test_same_bus_and_chip_select(tmp_path):
@@ -57,12 +57,13 @@ def test_same_bus_and_chip_select(tmp_path):
 
 
 def test_spi1_only_has_ce0(tmp_path):
-    expect_problem(tmp_path, "spi1-1cs", {"zones": {"zone2": {"spi_chip_select": 1}}})
+    expect_problem(tmp_path, "spi1-1cs", {"zones": {"zone2": {"spi_bus": 1, "spi_chip_select": 1}}})
 
 
 @pytest.mark.parametrize("pin", [18, 19, 20, 21])
 def test_relay_on_spi1_pin_rejected(tmp_path, pin):
-    expect_problem(tmp_path, "belongs to SPI1", {"zones": {"zone1": {"gpio_pin": pin}}})
+    expect_problem(tmp_path, "belongs to SPI1", {"zones": {"zone1": {"gpio_pin": pin},
+                                                            "zone2": {"spi_bus": 1, "spi_chip_select": 0}}})
 
 
 @pytest.mark.parametrize("pin", [7, 8, 9, 10, 11])
